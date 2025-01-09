@@ -70,11 +70,15 @@ public class Player {
 
     public Map<CardOrValueType, Set<CardName>> getSortedHand() {
         EnumMap<CardOrValueType, Set<CardName>> sortedHand = new EnumMap<>(CardOrValueType.class);
-        for (CardOrValueType cardType : CardOrValueType.getCardTypes()) {
-            sortedHand.put(cardType, EnumSet.noneOf(CardName.class));
-        }
         for (CardName cardName: hand) {
-            sortedHand.get(cardName.getCard().getCardType()).add(cardName);
+            CardOrValueType cardType = cardName.getCard().getCardType();
+            if (cardType == CardOrValueType.RAW_MATERIAL || cardType == CardOrValueType.MANUFACTURED_GOOD) {
+                cardType = CardOrValueType.RAW_MATERIAL_AND_MANUFACTURED_GOOD;
+            }
+            if (!sortedHand.containsKey(cardType)) {
+                sortedHand.put(cardType, EnumSet.noneOf(CardName.class));
+            }
+            sortedHand.get(cardType).add(cardName);
         }
         return sortedHand;
     }

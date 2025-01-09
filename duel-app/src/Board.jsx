@@ -1,7 +1,7 @@
 import './Board.css';
 import Card from './Card';
 
-export default function Board({cardSetter, age, cards}) {
+export default function Board({cardSetter, age, cards, selectedCardIndex}) {
 
     const pyramid = {
         1: {
@@ -293,6 +293,7 @@ export default function Board({cardSetter, age, cards}) {
                 key={rowItem["index"]}
                 cName={rowItem["column"]} 
                 index={rowItem["index"]}
+                selected={rowItem["index"] === selectedCardIndex}
                 cardName={cards[rowItem["index"]]["cardName"]} 
                 isActive={cards[rowItem["index"]]["isActive"]}  
                 cardSetter={cardSetter}>

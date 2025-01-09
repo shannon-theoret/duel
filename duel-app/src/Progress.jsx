@@ -1,32 +1,15 @@
 import progressBar from './img/progressBar.png';
 import militaryToken from './img/militaryToken.png';
-import agriculture from './img/agriculture.png';
-import architecture from './img/architecture.png';
-import economy from './img/economy.png';
-import law from './img/law.png';
-import masonry from './img/masonry.png';
-import philosophy from './img/philosophy.png';
-import strategy from './img/strategy.png';
-import theology from './img/theology.png';
-import urbanism from './img/urbanism.png';
+import {tokenImgMap} from './tokenMap.js';
+import broken2left from './img/broken2left.png';
+import broken2right from './img/broken2right.png';
+import broken5left from './img/broken5left.png';
+import broken5right from './img/broken5right.png';
 
-export default function Progress({military, tokensAvailable}) {
+export default function Progress({military, tokensAvailable, onTokenClick, chooseScience}) {
 
-    const tokenImgMap = {
-        "AGRICULTURE": agriculture,
-        "ARCHITECTURE": architecture,
-        "ECONOMY": economy,
-        "LAW": law,
-        "MASONRY": masonry,
-        "PHILOSOPHY": philosophy,
-        "STRATEGY": strategy,
-        "THEOLOGY": theology,
-        "URBANISM": urbanism
-      };
-
-      console.log(tokensAvailable);
       const tokenImgs = Array.from(tokensAvailable).map((value, index) => (
-        <img className={`progress${index}`} src={tokenImgMap[value]}/>
+      <img className={`progress${index}`} src={tokenImgMap[value]} onClick={chooseScience ? () => onTokenClick(value) : null}/>
       ));
 
     return (
@@ -34,6 +17,10 @@ export default function Progress({military, tokensAvailable}) {
         <img src={progressBar}></img>
         <img className={`military${military.militaryPosition}`} src={militaryToken}></img>
         {tokenImgs}
+        {military.loot5Player1Available && <img className='loot5Player1Available' src={broken5left}></img>}
+        {military.loot5Player2Available && <img className='loot5Player2Available' src={broken5right}></img>}
+        {military.loot2Player1Available && <img className='loot2Player1Available' src={broken2left}></img>}
+        {military.loot2Player2Available && <img className='loot2Player2Available' src={broken2right}></img>}
     </div>
     )
 }

@@ -172,6 +172,7 @@
     flex-direction: column;
     gap: 10px;
     position: relative;
+    margin: 15px;
   }
   
   .playerHand h4, .playerHand h5 {
@@ -212,7 +213,6 @@
     position: relative;
     justify-content: center;
     width: 640px;
-    height: 400px;
   }
   
   .cardColumn {
@@ -236,5 +236,7 @@
   }
 
   .playerMoves {
-    height: 120px;
+    display: flex;
+    flex-direction: column;
+    margin: 10px;
   }

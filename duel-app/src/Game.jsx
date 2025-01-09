@@ -6,7 +6,7 @@ import Hand from "./Hand";
 import Progress from "./Progress";
 import axios from "axios";
 import { useParams } from "react-router-dom";
-import Instructions from "../Instructions";
+import Instructions from "./Instructions";
 
 export default function Game() {
 
@@ -32,28 +32,40 @@ export default function Game() {
           }
           }).then((response) => {
             setGame(response.data);
-            setSelectedCardIndex("");
+            setSelectedCardIndex(null);
           }).catch((error) => {
             console.error('Error:', error);
           });
     }
 
-      function discard() {
+    const discard = () => {
         axios.post(`/api/${code}/discard`, null, {
           params: {
             index: selectedCardIndex
         }
         }).then((response) => {
             setGame(response.data);
-            setSelectedCardIndex("");
+            setSelectedCardIndex(null);
           }).catch((error) => {
             console.error('Error:', error);
           });
-      }
+    }
+
+    const chooseProgressToken = (token) => {
+      axios.post(`/api/${code}/chooseProgressToken`, null, {
+        params: {
+          progressToken: token
+        }
+      }).then((response) => {
+        setGame(response.data);
+      }).catch((error) => {
+        console.error('Error:', error);
+      })
+    }
 
       function constructWonder() {
         console.log(selectedCardIndex + " was used to construct a wonder");
-        setSelectedCard("");
+        setSelectedCardIndex(null);
       }
 
       function testStuff() {
@@ -66,19 +78,18 @@ export default function Game() {
         game.step !== "SETUP" && (
         <div className="game">  
           <div className="gameInner1">
-            <Progress military={game.military} tokensAvailable={game.tokensAvailable}></Progress>
-            <Board cardSetter={setSelectedCardIndex} age={game.age} cards={game.visiblePyramid}></Board>
+            <Progress chooseScience={game.step ==="CHOOSE_SCIENCE"} military={game.military} tokensAvailable={game.tokensAvailable} onTokenClick={chooseProgressToken}></Progress>
+            <Board cardSetter={setSelectedCardIndex} age={game.age} cards={game.visiblePyramid} selectedCardIndex={selectedCardIndex}></Board>
           </div>
           <div className="gameInner2">
             <div className="playerMoves">
               <Instructions step={game.step} currentPlayerNumber={game.currentPlayerNumber} cardSelected={selectedCardIndex}></Instructions>
-              {selectedCardIndex && game.step === "PLAY_CARD"?
-              (<><Button text="Construct the Building" onClick={constructBuilding}></Button>
-              <Button text="Discard the card to obtain coins" onClick={discard}></Button> 
-              <Button text="Construct a Wonder" onClick={constructWonder}></Button></>) :null}
+              {selectedCardIndex != null && game.step === "PLAY_CARD"?
+              (<div><Button text="Construct the Building" onClick={constructBuilding}></Button>
+              <Button text="Discard the card to obtain coins" onClick={discard}></Button></div>) :null}
             </div>
-            {/*<Hand num={1} cards={game.player1.hand} money={game.player1.money}></Hand>
-            <Hand num={2} cards={game.player2.hand} money={game.player2.money}></Hand>*/}
+            <Hand num={1} sortedHand={game.player1.sortedHand} money={game.player1.money} tokens={game.player1.tokens}></Hand>
+            <Hand num={2} sortedHand={game.player2.sortedHand} money={game.player2.money} tokens={game.player2.tokens}></Hand>
           </div>
         </div>)
         );

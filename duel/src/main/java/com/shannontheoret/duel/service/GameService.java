@@ -137,9 +137,9 @@ public class GameService {
                     militaryGain += 1;
                 }
                 if (game.getCurrentPlayerNumber() == 1) {
-                    game.getMilitary().setMilitaryPosition(militaryGain);
+                    game.getMilitary().setMilitaryPosition(game.getMilitary().getMilitaryPosition()+ militaryGain);
                 } else {
-                    game.getMilitary().setMilitaryPosition(-1 * militaryGain);
+                    game.getMilitary().setMilitaryPosition(game.getMilitary().getMilitaryPosition() - militaryGain);
                 }
                 game.applyMilitaryEffect();
                 break;
@@ -155,7 +155,9 @@ public class GameService {
         player.setMoney(player.getMoney() + monetaryGain);
         game.getPyramid().remove(cardIndex);
         player.getHand().add(cardName);
-        endTurn(game);
+        if (game.getStep() == GameStep.PLAY_CARD) {
+            endTurn(game);
+        }
         save(game);
         return game;
     }
@@ -269,9 +271,11 @@ public class GameService {
         if (game.getPyramid().isEmpty()) {
             switch (game.getAge()) {
                 case 1:
+                    game.setAge(2);
                     game.setPyramid(generateAgeTwoPyramid());
                     break;
                 case 2:
+                    game.setAge(3);
                     game.setPyramid(generateAgeThreePyramid());
                     break;
                 case 3:

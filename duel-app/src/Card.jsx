@@ -13,7 +13,7 @@ import glassworks from './img/glassworks.jpg';
 import guardTower from './img/guardTower.jpg';
 import loggingCamp from './img/loggingCamp.jpg';
 import lumbarYard from './img/lumbarYard.jpg';
-import palidage from './img/palidage.jpg';
+import palisade from './img/palisade.jpg';
 import pharmacist from './img/pharmacist.jpg';
 import press from './img/press.jpg';
 import quarry from './img/quarry.jpg';
@@ -76,7 +76,7 @@ import scientistsGuild from './img/g_scientistsGuild.jpg';
 import shipownersGuild from './img/g_shipownersGuild.jpg';
 import tacticiansGuild from './img/g_tacticiansGuild.jpg';
 
-export default function Card({cName, cardName, isActive, cardSetter, index}) {
+export default function Card({cName, cardName, isActive, cardSetter, index, selected}) {
     const imgMap = {
         "AGE_ONE_BACK": <img src={ageOneBack}/>,
         "AGE_TWO_BACK": <img src={ageTwoBack} />,
@@ -93,7 +93,7 @@ export default function Card({cName, cardName, isActive, cardSetter, index}) {
         "GUARD_TOWER": <img src={guardTower}/>,
         "LOGGING_CAMP": <img src={loggingCamp}/>,
         "LUMBER_YARD": <img src={lumbarYard}/>,
-        "PALISADE": <img src={palidage}/>,
+        "PALISADE": <img src={palisade}/>,
         "PHARMACIST": <img src={pharmacist}/>,
         "PRESS": <img src={press}/>,
         "QUARRY": <img src={quarry}/>,
@@ -110,7 +110,7 @@ export default function Card({cName, cardName, isActive, cardSetter, index}) {
         "BARRACKS": <img src={barracks} />,
         "BREWERY": <img src={brewery} />,
         "BRICKYARD": <img src={brickyard} />,
-        "CARAVANSeRY": <img src={caravansery} />,
+        "CARAVANSERY": <img src={caravansery} />,
         "COURTHOUSE": <img src={courthouse} />,
         "CUSTOMS_HOUSE": <img src={customsHouse} />,
         "DISPENSARY": <img src={dispensary} />,
@@ -157,5 +157,5 @@ export default function Card({cName, cardName, isActive, cardSetter, index}) {
         "TACTICIANS_GUILD": <img src={tacticiansGuild} />
     }
 
-    return <span className={cName} onClick={isActive? () => cardSetter(index) : null}>{imgMap[cardName]}</span>;
+    return <span className={cName + (selected ? " sel" : "")} onClick={isActive? () => cardSetter(index) : null}>{imgMap[cardName]}</span>;
 }
