@@ -6,6 +6,7 @@ public enum ProgressToken {
     ECONOMY,
     LAW,
     MASONRY,
+    MATHEMATICS,
     PHILOSOPHY,
     STRATEGY,
     THEOLOGY,

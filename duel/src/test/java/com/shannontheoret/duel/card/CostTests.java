@@ -51,11 +51,18 @@ public class CostTests {
 
         assertEquals(3, monetaryCost);
     }
-    /*
+
     @Test
     public void calculateTotalMonetaryCost_yellowOneOfAvailable() {
         Cost cost = new Cost(0, new ArrayList<>(Arrays.asList(Resource.BRICK, Resource.STONE, Resource.PAPYRUS)));
         Set<CardName> playerHand = new HashSet<>();
-        playerHand.add()
-    }*/
+        playerHand.add(CardName.CARAVANSERY);
+        playerHand.add(CardName.DRYING_ROOM);
+        Set<CardName> opponentHand = new HashSet<>();
+        opponentHand.add(CardName.CLAY_PIT);
+
+        Integer monetaryCost = cost.calculateTotalMonetaryCost(playerHand, opponentHand);
+
+        assertEquals(2, monetaryCost);
+    }
 }

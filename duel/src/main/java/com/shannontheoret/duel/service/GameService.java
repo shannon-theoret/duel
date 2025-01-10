@@ -5,6 +5,7 @@ import com.shannontheoret.duel.GameStep;
 import com.shannontheoret.duel.ProgressToken;
 import com.shannontheoret.duel.card.*;
 import com.shannontheoret.duel.dao.GameDao;
+import com.shannontheoret.duel.dao.MilitaryDao;
 import com.shannontheoret.duel.dao.PlayerDao;
 import com.shannontheoret.duel.entity.Game;
 import com.shannontheoret.duel.entity.Military;
@@ -24,10 +25,13 @@ public class GameService {
     private GameDao gameDao;
     private PlayerDao playerDao;
 
+    private MilitaryDao militaryDao;
+
     @Autowired
-    public GameService(GameDao gameDao, PlayerDao playerDao) {
+    public GameService(GameDao gameDao, PlayerDao playerDao, MilitaryDao militaryDao) {
         this.gameDao = gameDao;
         this.playerDao = playerDao;
+        this.militaryDao = militaryDao;
     }
 
     @Transactional
@@ -61,7 +65,8 @@ public class GameService {
         tokensAvailable.addAll(allTokens.subList(0,5));
         game.setTokensAvailable(tokensAvailable);
         EnumSet<ProgressToken> tokensUnavailable = EnumSet.noneOf(ProgressToken.class);
-        tokensUnavailable.addAll(allTokens.subList(5,9));
+        tokensUnavailable.addAll(allTokens.subList(5,10));
+        game.setTokensUnavailable(tokensUnavailable);
         game.setPyramid(generateStartingPyramid());
 
         save(game);
@@ -207,6 +212,7 @@ public class GameService {
     private void save(Game game) {
         playerDao.save(game.getPlayer1());
         playerDao.save(game.getPlayer2());
+        militaryDao.save(game.getMilitary());
         gameDao.save(game);
     }
 

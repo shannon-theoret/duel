@@ -34,7 +34,7 @@ public class Player {
     private Set<CardName> hand = new HashSet<>();
 
     @Column(name="money", nullable = false)
-    private Integer money = 8;
+    private Integer money = 7;
 
     @ElementCollection
     @CollectionTable(
@@ -121,6 +121,30 @@ public class Player {
 
     public boolean checkNewScienceMatch(ScienceSymbol newSymbol) {
         return collectAllScienceSymbols().contains(newSymbol);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Player player = (Player) o;
+
+        if (!id.equals(player.id)) return false;
+        if (!hand.equals(player.hand)) return false;
+        if (!money.equals(player.money)) return false;
+        if (!tokens.equals(player.tokens)) return false;
+        return won.equals(player.won);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = id.hashCode();
+        result = 31 * result + hand.hashCode();
+        result = 31 * result + money.hashCode();
+        result = 31 * result + tokens.hashCode();
+        result = 31 * result + won.hashCode();
+        return result;
     }
 
     private Set<ScienceSymbol> collectAllScienceSymbols() {
