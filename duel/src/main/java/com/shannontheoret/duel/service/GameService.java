@@ -176,7 +176,9 @@ public class GameService {
         }
         progressEffects(game, progressToken);
         game.getTokensAvailable().remove(progressToken);
-        endTurn(game);
+        if (game.getStep() == GameStep.CHOOSE_SCIENCE) {
+            endTurn(game);
+        }
         save(game);
         return game;
     }
@@ -322,6 +324,7 @@ public class GameService {
             player.setWon(true);
         }
     }
+
 
     private static void confirmCorrectStep(Game game, GameStep expectedStep) throws InvalidMoveException {
         if (game.getStep() != expectedStep) {

@@ -130,7 +130,7 @@ public class Player {
 
         Player player = (Player) o;
 
-        if (!id.equals(player.id)) return false;
+        if (!Objects.equals(id, player.id)) return false;
         if (!hand.equals(player.hand)) return false;
         if (!money.equals(player.money)) return false;
         if (!tokens.equals(player.tokens)) return false;
@@ -139,7 +139,7 @@ public class Player {
 
     @Override
     public int hashCode() {
-        int result = id.hashCode();
+        int result = id != null ? id.hashCode() : 0;
         result = 31 * result + hand.hashCode();
         result = 31 * result + money.hashCode();
         result = 31 * result + tokens.hashCode();
