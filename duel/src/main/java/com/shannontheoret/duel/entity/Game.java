@@ -205,7 +205,13 @@ public class Game {
         }
     }
 
-    public void applyMilitaryEffect() {
+    public void applyMilitaryEffect() throws InvalidMoveException {
+        if (military.getMilitaryPosition() > 9) {
+            military.setMilitaryPosition(9);
+        }
+        if (military.getMilitaryPosition() < -9) {
+            military.setMilitaryPosition(-9);
+        }
         if (military.getMilitaryPosition() >= -8 && military.getMilitaryPosition() <= -6 && military.getLoot5Player1Available()) {
             military.setLoot5Player1Available(false);
             player1.decreaseMoneyButNotIntoNegative(5);
@@ -220,6 +226,7 @@ public class Game {
             player2.decreaseMoneyButNotIntoNegative(5);
         } else if (military.getMilitaryPosition() == -9 || military.getMilitaryPosition() == 9) {
             step = GameStep.GAME_END;
+            findActivePlayer().setWon(true);
         }
     }
 }

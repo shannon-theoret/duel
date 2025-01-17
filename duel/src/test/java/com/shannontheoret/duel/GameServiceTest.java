@@ -128,15 +128,205 @@ public class GameServiceTest {
 
         when(gameDao.findByCode("123")).thenReturn(game);
 
+        assertEquals(4, CardName.ARMORY.getCard().getCost().calculateTotalMonetaryCost(game.getPlayer1().getHand(), game.getPlayer2().getHand()));
+
         gameService.constructBuilding("123", 17);
 
-        assertEquals(4, CardName.ARMORY.getCard().getCost().calculateTotalMonetaryCost(game.getPlayer1().getHand(), game.getPlayer2().getHand()));
         assertEquals(3, game.getPlayer1().getMoney(), "Player money should be 3.");
         assertEquals(GameStep.PLAY_CARD, game.getStep(), "Game step should be PLAY_CARD.");
         assertEquals(Set.of(CardName.STONE_PIT, CardName.BATHS, CardName.WALLS, CardName.GARRISON, CardName.ARMORY), game.getPlayer1().getHand(), "Player hand should have added ARMORY.");
         assertFalse(game.getPyramid().containsKey(17), "Pyramid should not contain key 17.");
         assertEquals(Set.of(CardName.AQUEDUCT, CardName.ARCHERY_RANGE), game.getDiscardedCards(), "Discarded cards should remain the same.");
         assertEquals(3, game.getAge(),"Age should remain 3.");
+
+        verify(gameDao, times(2)).save(game);
+        verify(playerDao, times(4)).save(any(Player.class));
+        verify(militaryDao, times(2)).save(game.getMilitary());
+    }
+
+    @Test
+    public void constructBuilding_commercialBuildingWithMultipleMoneyPerType() throws InvalidMoveException, GameCodeNotFoundException {
+        doNothing().when(gameDao).save(any(Game.class));
+        doNothing().when(playerDao).save(any(Player.class));
+        doNothing().when(militaryDao).save(any(Military.class));
+
+        Game game = gameService.newGame();
+
+        game.setPyramid(createAgeThreePyramid());
+        game.getPyramid().put(4, CardName.PANTHEON);
+        game.getPyramid().put(18, CardName.CHAMBER_OF_COMMERCE);
+        game.setAge(3);
+        game.setCurrentPlayerNumber(2);
+        game.getPlayer1().setMoney(4);
+        game.getPlayer2().setMoney(3);
+        game.getPlayer2().getHand().addAll(Set.of(CardName.STATUE, CardName.PALISADE, CardName.GLASSWORKS, CardName.PRESS));
+
+        when(gameDao.findByCode("123")).thenReturn(game);
+
+
+        assertEquals(2, CardName.CHAMBER_OF_COMMERCE.getCard().getCost().calculateTotalMonetaryCost(game.getPlayer2().getHand(), game.getPlayer1().getHand()));
+
+        gameService.constructBuilding("123", 18);
+
+        assertEquals(7, game.getPlayer2().getMoney(), "Player 2 money should have increased from 3 to 7.");
+        assertEquals(GameStep.PLAY_CARD, game.getStep(), "Game step should be PLAY_CARD.");
+        assertEquals(Set.of(CardName.STATUE, CardName.PALISADE, CardName.GLASSWORKS, CardName.PRESS, CardName.CHAMBER_OF_COMMERCE), game.getPlayer2().getHand());
+        assertFalse(game.getPyramid().containsKey(18), "Pyramid should not contain index 18.");
+
+        verify(gameDao, times(2)).save(game);
+        verify(playerDao, times(4)).save(any(Player.class));
+        verify(militaryDao, times(2)).save(game.getMilitary());
+    }
+
+    @Test
+    public void constructBuilding_militarySupremacy() throws InvalidMoveException, GameCodeNotFoundException {
+        doNothing().when(gameDao).save(any(Game.class));
+        doNothing().when(playerDao).save(any(Player.class));
+        doNothing().when(militaryDao).save(any(Military.class));
+
+        Game game = gameService.newGame();
+
+        game.getMilitary().setMilitaryPosition(-8);
+        game.getMilitary().setLoot5Player1Available(false);
+        game.getMilitary().setLoot2Player1Available(false);
+        Map<Integer, CardName> pyramid = new HashMap<>();
+        pyramid.putAll(Map.of(0, CardName.LIGHTHOUSE,
+                1, CardName.GARDENS,
+                2, CardName.SENATE,
+                3, CardName.SIEGE_WORKSHOP,
+                4, CardName.CHAMBER_OF_COMMERCE));
+        game.setPyramid(pyramid);
+        game.setAge(3);
+        game.getPlayer2().getHand().addAll(Set.of(CardName.ARCHERY_RANGE));
+        game.setCurrentPlayerNumber(2);
+        game.getPlayer1().setMoney(2);
+        game.getPlayer2().setMoney(6);
+
+        assertEquals(0, CardName.SIEGE_WORKSHOP.getCard().getCost().calculateTotalMonetaryCost(game.getPlayer2().getHand(), game.getPlayer1().getHand()), "Cost should be 0.");
+
+        when(gameDao.findByCode("123")).thenReturn(game);
+
+        gameService.constructBuilding("123", 3);
+
+        assertFalse(game.getPyramid().containsKey(3), "Pyramid should not contain index 3.");
+        assertEquals(GameStep.GAME_END, game.getStep(), "Game step should be GAME_END.");
+        assertTrue(game.getPlayer2().getWon(), "Player 2 should have won.");
+        assertEquals(-9, game.getMilitary().getMilitaryPosition(), "Military position should be -9.");
+        assertFalse(game.getMilitary().getLoot5Player1Available(), "Loot 5 player 1 should not be available.");
+        assertEquals(Set.of(CardName.ARCHERY_RANGE, CardName.SIEGE_WORKSHOP), game.getPlayer2().getHand(), "Hand should have SIEGE_WORKSHOP added to it.");
+
+        verify(gameDao, times(2)).save(game);
+        verify(playerDao, times(4)).save(any(Player.class));
+        verify(militaryDao, times(2)).save(game.getMilitary());
+    }
+
+
+    @Test
+    public void constructBuilding_militaryMultipleMilitaryPower() throws InvalidMoveException, GameCodeNotFoundException {
+        doNothing().when(gameDao).save(any(Game.class));
+        doNothing().when(playerDao).save(any(Player.class));
+        doNothing().when(militaryDao).save(any(Military.class));
+
+        Game game = gameService.newGame();
+
+        game.getMilitary().setMilitaryPosition(2);
+        game.getMilitary().setLoot2Player2Available(true);
+        game.setPyramid(createAgeTwoPyramid());
+        game.getPyramid().remove(19);
+        game.getPyramid().remove(18);
+        game.setAge(2);
+        game.setCurrentPlayerNumber(1);
+        game.getPlayer1().getHand().addAll(Set.of(CardName.PALISADE, CardName.QUARRY, CardName.WOOD_RESERVE));
+        game.getPlayer2().getHand().addAll(Set.of(CardName.TAVERN));
+        game.getPlayer1().setMoney(8);
+        game.getPlayer2().setMoney(3);
+
+        when(gameDao.findByCode("123")).thenReturn(game);
+
+        assertEquals(3, CardName.ARCHERY_RANGE.getCard().getCost().calculateTotalMonetaryCost(game.getPlayer1().getHand(), game.getPlayer2().getHand()), "Cost should equal 3.");
+
+        gameService.constructBuilding("123", 16);
+
+        assertEquals(Set.of(CardName.PALISADE, CardName.QUARRY, CardName.WOOD_RESERVE, CardName.ARCHERY_RANGE), game.getPlayer1().getHand(), "Player hand should have added ARCHERY_RANGE.");
+        assertEquals(5, game.getPlayer1().getMoney(), "Player 1 money should have decreased from 8 to 5.");
+        assertEquals(1, game.getPlayer2().getMoney(), "Player money should have decreased from 3 to 1.");
+        assertEquals(GameStep.PLAY_CARD, game.getStep(), "Game step should be PLAY_CARD.");
+        assertEquals(2, game.getCurrentPlayerNumber(), "Current player number should be 2.");
+        assertFalse(game.getPyramid().containsKey(16));
+        assertEquals(4, game.getMilitary().getMilitaryPosition(), "Military position should have increased from 2 to 4.");
+        assertFalse(game.getMilitary().getLoot2Player2Available(), "Loot 2 Player 1 should not be available.");
+
+        verify(gameDao, times(2)).save(game);
+        verify(playerDao, times(4)).save(any(Player.class));
+        verify(militaryDao, times(2)).save(game.getMilitary());
+    }
+
+    @Test
+    public void constructBuilding_militaryWithStrategyToken() throws InvalidMoveException, GameCodeNotFoundException {
+        doNothing().when(gameDao).save(any(Game.class));
+        doNothing().when(playerDao).save(any(Player.class));
+        doNothing().when(militaryDao).save(any(Military.class));
+
+        Game game = gameService.newGame();
+
+        game.setPyramid(createAgeOnePyramid());
+        game.getPyramid().remove(19);
+        game.getPyramid().remove(18);
+        game.setCurrentPlayerNumber(1);
+        game.getPlayer1().getTokens().addAll(Set.of(ProgressToken.STRATEGY));
+        game.getPlayer1().setMoney(7);
+        game.getPlayer2().setMoney(7);
+        game.getMilitary().setMilitaryPosition(1);
+        game.getMilitary().setLoot2Player2Available(false);
+
+        assertEquals(2, CardName.GARRISON.getCard().getCost().calculateTotalMonetaryCost(game.getPlayer1().getHand(), game.getPlayer2().getHand()), "Cost should be 2.");
+
+        when(gameDao.findByCode("123")).thenReturn(game);
+
+        gameService.constructBuilding("123", 13);
+
+        assertEquals(GameStep.PLAY_CARD, game.getStep(), "Game step should be PLAY_CARD.");
+        assertEquals(2, game.getCurrentPlayerNumber(), "Currect player number should be 2.");
+        assertEquals(1, game.getAge(), "Age should be 1.");
+        assertEquals(Set.of(CardName.GARRISON), game.getPlayer1().getHand(), "Player 1 hand must have GARRISON.");
+        assertFalse(game.getPyramid().containsKey(13));
+        assertEquals(3, game.getMilitary().getMilitaryPosition(), "Military position is 3.");
+        assertFalse(game.getMilitary().getLoot2Player2Available(), "Loot 2 player 2 should not be available.");
+        assertEquals(5, game.getPlayer1().getMoney(), "PLayer 1 money should be 5.");
+        assertEquals(7, game.getPlayer2().getMoney(), "PLayer 2 money should be 7.");
+
+        verify(gameDao, times(2)).save(game);
+        verify(playerDao, times(4)).save(any(Player.class));
+        verify(militaryDao, times(2)).save(game.getMilitary());
+    }
+
+    @Test
+    public void constructBuilding_militaryMoneyOnlyDecreaseToZero() throws InvalidMoveException, GameCodeNotFoundException {
+        doNothing().when(gameDao).save(any(Game.class));
+        doNothing().when(playerDao).save(any(Player.class));
+        doNothing().when(militaryDao).save(any(Military.class));
+
+        Game game = gameService.newGame();
+
+        game.setPyramid(createAgeTwoPyramid());
+        game.setCurrentPlayerNumber(2);
+        game.setAge(2);
+        game.getPlayer1().setMoney(1);
+        game.getPlayer2().setMoney(6);
+        game.getMilitary().setMilitaryPosition(-2);
+        game.getMilitary().setLoot2Player1Available(true);
+
+        assertEquals(3, CardName.BARRACKS.getCard().getCost().calculateTotalMonetaryCost(game.getPlayer2().getHand(), game.getPlayer1().getHand()), "Cost should be 3.");
+
+        when(gameDao.findByCode("123")).thenReturn(game);
+
+        gameService.constructBuilding("123", 18);
+
+        assertEquals(-3, game.getMilitary().getMilitaryPosition(), "Military position should be -3.");
+        assertEquals(Set.of(CardName.BARRACKS), game.getPlayer2().getHand(), "Player 2 hand should contain BARRACKS.");
+        assertFalse(game.getMilitary().getLoot2Player1Available(), "Loot 2 player 1 should not be available.");
+        assertEquals(0, game.getPlayer1().getMoney(), "Player 1 money should be 0.");
+        assertEquals(3, game.getPlayer2().getMoney(), "Player 2 money should be 3.");
 
         verify(gameDao, times(2)).save(game);
         verify(playerDao, times(4)).save(any(Player.class));
