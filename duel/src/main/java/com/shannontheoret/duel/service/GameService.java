@@ -150,7 +150,7 @@ public class GameService {
                 break;
             case SCIENTIFIC_BUILDING:
                 ScientificBuildingCard scientificBuildingCard = (ScientificBuildingCard) cardName.getCard();
-                if (player.checkNewScienceMatch(scientificBuildingCard.getScienceSymbol())) {
+                if (player.checkNewScienceMatch(scientificBuildingCard.getScienceSymbol()) && !game.getTokensAvailable().isEmpty()) {
                     game.setStep(GameStep.CHOOSE_SCIENCE);
                 }
                 break;

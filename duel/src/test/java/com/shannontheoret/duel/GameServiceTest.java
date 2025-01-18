@@ -334,6 +334,179 @@ public class GameServiceTest {
     }
 
     @Test
+    public void constructBuilding_scienceNoNewMatch() throws InvalidMoveException, GameCodeNotFoundException {
+        doNothing().when(gameDao).save(any(Game.class));
+        doNothing().when(playerDao).save(any(Player.class));
+        doNothing().when(militaryDao).save(any(Military.class));
+
+        Game game = gameService.newGame();
+
+        Map<Integer, CardName> pyramid = new HashMap<>();
+        pyramid.putAll(Map.of(0, CardName.DISPENSARY,
+                1, CardName.CUSTOMS_HOUSE));
+        game.setPyramid(pyramid);
+        game.setAge(2);
+        game.setCurrentPlayerNumber(1);
+        game.getPlayer1().getHand().addAll(Set.of(CardName.WORKSHOP, CardName.LABORATORY, CardName.TAVERN, CardName.STONE_PIT, CardName.BRICKYARD));
+        game.getPlayer1().setMoney(4);
+        game.getPlayer1().getTokens().add(ProgressToken.URBANISM);
+
+        assertEquals(0, CardName.DISPENSARY.getCard().getCost().calculateTotalMonetaryCost(game.getPlayer1().getHand(), game.getPlayer2().getHand()), "Cost should be 0.");
+
+        when(gameDao.findByCode("123")).thenReturn(game);
+
+        gameService.constructBuilding("123", 0);
+
+        assertEquals(GameStep.PLAY_CARD, game.getStep(), "Game step should be PLAY_CARD.");
+        assertEquals(2, game.getCurrentPlayerNumber(), "Current player number should be 2.");
+        assertEquals(4, game.getPlayer1().getMoney(), "Player 1 money should be 4.");
+        assertEquals(Set.of(CardName.WORKSHOP, CardName.LABORATORY, CardName.TAVERN, CardName.STONE_PIT, CardName.BRICKYARD, CardName.DISPENSARY), game.getPlayer1().getHand());
+        assertEquals(2, game.getAge(), "Age should be 2.");
+        assertFalse(game.getPyramid().containsKey(0), "Pyramid should not contain index 0.");
+        assertEquals(Set.of(ProgressToken.URBANISM), game.getPlayer1().getTokens(), "Player 1 should have URBANISM token only.");
+
+        verify(gameDao, times(2)).save(game);
+        verify(playerDao, times(4)).save(any(Player.class));
+        verify(militaryDao, times(2)).save(game.getMilitary());
+    }
+
+    @Test
+    public void constructBuilding_scienceMatch() throws InvalidMoveException, GameCodeNotFoundException {
+        doNothing().when(gameDao).save(any(Game.class));
+        doNothing().when(playerDao).save(any(Player.class));
+        doNothing().when(militaryDao).save(any(Military.class));
+
+        Game game = gameService.newGame();
+
+        Map<Integer, CardName> pyramid = new HashMap<>();
+        pyramid.putAll(Map.of(0, CardName.SCHOOL));
+
+        game.setPyramid(pyramid);
+        game.setAge(2);
+        game.setCurrentPlayerNumber(1);
+        game.getPlayer1().getHand().addAll(Set.of(CardName.LIBRARY, CardName.APOTHECARY, CardName.BATHS, CardName.STABLE));
+        game.getMilitary().setMilitaryPosition(7);
+
+        assertEquals(6, CardName.SCHOOL.getCard().getCost().calculateTotalMonetaryCost(game.getPlayer1().getHand(), game.getPlayer2().getHand()), "Monetary cost should be 6.");
+
+        when(gameDao.findByCode("123")).thenReturn(game);
+
+        gameService.constructBuilding("123", 0);
+
+        assertEquals(GameStep.CHOOSE_SCIENCE, game.getStep(), "Game step should be CHOOSE_SCIENCE.");
+        assertEquals(1, game.getCurrentPlayerNumber(), "Current player number should be 1");
+        assertEquals(2, game.getAge(), "Age should remain at 2");
+        assertTrue(game.getPyramid().isEmpty(), "Pyramid should not have any cards.");
+        assertEquals(7, game.getMilitary().getMilitaryPosition(), "Military position should remain at 7.");
+        assertEquals(Set.of(CardName.LIBRARY, CardName.APOTHECARY, CardName.SCHOOL, CardName.BATHS, CardName.STABLE), game.getPlayer1().getHand(), "Hand should have added SCHOOL.");
+
+        verify(gameDao, times(2)).save(game);
+        verify(playerDao, times(4)).save(any(Player.class));
+        verify(militaryDao, times(2)).save(game.getMilitary());
+    }
+
+    @Test
+    public void constructBuilding_scienceMatchNoAvailableTokens() throws InvalidMoveException, GameCodeNotFoundException {
+        doNothing().when(gameDao).save(any(Game.class));
+        doNothing().when(playerDao).save(any(Player.class));
+        doNothing().when(militaryDao).save(any(Military.class));
+
+        Game game = gameService.newGame();
+
+        game.setAge(3);
+        game.setPyramid(createAgeThreePyramid());
+        game.getPyramid().remove(18);
+        game.getTokensAvailable().clear();
+        game.setCurrentPlayerNumber(2);
+        game.getPlayer2().getHand().addAll(Set.of(CardName.UNIVERSITY, CardName.ALTER));
+
+        when(gameDao.findByCode("123")).thenReturn(game);
+
+        gameService.constructBuilding("123", 15);
+
+        assertEquals(Set.of(CardName.UNIVERSITY, CardName.ALTER, CardName.OBSERVATORY), game.getPlayer2().getHand(), "Player 2 hand should include OBSERVATORY.");
+        assertFalse(game.getPyramid().containsKey(15), "Pyramid should not contain index 15.");
+        assertEquals(GameStep.PLAY_CARD, game.getStep(), "Game stpe should be PLAY_CARD.");
+        assertEquals(1, game.getCurrentPlayerNumber(), "Current player number should be 1.");
+        assertTrue(game.getTokensAvailable().isEmpty(), "There should be no tokens available.");
+
+        verify(gameDao, times(2)).save(game);
+        verify(playerDao, times(4)).save(any(Player.class));
+        verify(militaryDao, times(2)).save(game.getMilitary());
+    }
+
+    @Test
+    public void constructBuilding_guildCurrentPlayerMoreCards() throws InvalidMoveException, GameCodeNotFoundException {
+        doNothing().when(gameDao).save(any(Game.class));
+        doNothing().when(playerDao).save(any(Player.class));
+        doNothing().when(militaryDao).save(any(Military.class));
+
+        Game game = gameService.newGame();
+
+        game.setAge(3);
+        game.setPyramid(createAgeThreePyramid());
+        game.getPyramid().remove(19);
+        game.getPyramid().remove(18);
+        game.getPyramid().remove(17);
+        game.getPyramid().remove(16);
+        game.getPyramid().remove(15);
+        game.setAge(3);
+        game.setCurrentPlayerNumber(1);
+        game.getPlayer1().getHand().addAll(Set.of(CardName.ALTER, CardName.BATHS, CardName.ARCHERY_RANGE, CardName.BRICKYARD, CardName.STONE_PIT));
+        game.getPlayer2().getHand().addAll(Set.of(CardName.STATUE, CardName.DRYING_ROOM));
+
+        assertEquals(7, CardName.MAGISTRATES_GUILD.getCard().getCost().calculateTotalMonetaryCost(game.getPlayer1().getHand(), game.getPlayer2().getHand()));
+
+        when(gameDao.findByCode("123")).thenReturn(game);
+
+        gameService.constructBuilding("123", 13);
+
+        assertEquals(GameStep.PLAY_CARD, game.getStep(), "Game step should be PLAY_CARD.");
+        assertEquals(2, game.getCurrentPlayerNumber(), "Current player number should be 2.");
+        assertEquals(Set.of(CardName.ALTER, CardName.BATHS, CardName.ARCHERY_RANGE, CardName.BRICKYARD, CardName.STONE_PIT, CardName.MAGISTRATES_GUILD), game.getPlayer1().getHand(), "Player 1 hand should have added MAGISTRATES_GUILD");
+        assertFalse(game.getPyramid().containsKey(13));
+        assertEquals(2, game.getPlayer1().getMoney(), "Player 1 money should be 2.");
+
+        verify(gameDao, times(2)).save(game);
+        verify(playerDao, times(4)).save(any(Player.class));
+        verify(militaryDao, times(2)).save(game.getMilitary());
+    }
+
+    @Test
+    public void constructBuilding_guildOtherPlayerMoreCards() throws InvalidMoveException, GameCodeNotFoundException {
+        doNothing().when(gameDao).save(any(Game.class));
+        doNothing().when(playerDao).save(any(Player.class));
+        doNothing().when(militaryDao).save(any(Military.class));
+
+        Game game = gameService.newGame();
+
+        game.setAge(3);
+        game.setPyramid(createAgeThreePyramid());
+        game.getPyramid().remove(19);
+        game.getPyramid().remove(18);
+        game.setCurrentPlayerNumber(1);
+        game.getPlayer1().setMoney(10);
+        game.getPlayer1().getHand().addAll(Set.of(CardName.STONE_PIT, CardName.ALTER, CardName.LUMBER_YARD));
+        game.getPlayer2().getHand().addAll(Set.of(CardName.CUSTOMS_HOUSE, CardName.DISPENSARY));
+
+        assertEquals(6, CardName.SCIENTISTS_GUILD.getCard().getCost().calculateTotalMonetaryCost(game.getPlayer1().getHand(), game.getPlayer2().getHand()), "Cost should be 6.");
+
+        when(gameDao.findByCode("123")).thenReturn(game);
+
+        gameService.constructBuilding("123", 16);
+
+        assertEquals(GameStep.PLAY_CARD, game.getStep(), "Game step should be PLAY_CARD.");
+        assertEquals(2, game.getCurrentPlayerNumber(), "Current player number should be 2.");
+        assertEquals(Set.of(CardName.STONE_PIT, CardName.ALTER, CardName.LUMBER_YARD, CardName.SCIENTISTS_GUILD), game.getPlayer1().getHand(), "Player 1 hand should have added SCIENTISTS_GUILD.");
+        assertFalse(game.getPyramid().containsKey(16), "Pyramid should not have index 16.");
+        assertEquals(5, game.getPlayer1().getMoney(), "Player 1 money should be 5.");
+
+        verify(gameDao, times(2)).save(game);
+        verify(playerDao, times(4)).save(any(Player.class));
+        verify(militaryDao, times(2)).save(game.getMilitary());
+    }
+
+    @Test
     public void chooseProgressToken_valid() throws InvalidMoveException, GameCodeNotFoundException {
         doNothing().when(gameDao).save(any(Game.class));
         doNothing().when(playerDao).save(any(Player.class));
@@ -371,6 +544,39 @@ public class GameServiceTest {
         verify(playerDao, times(4)).save(any(Player.class));
         verify(militaryDao, times(2)).save(game.getMilitary());
 
+    }
+
+    @Test
+    public void chooseProgressToken_startNewAge() throws InvalidMoveException, GameCodeNotFoundException {
+        doNothing().when(gameDao).save(any(Game.class));
+        doNothing().when(playerDao).save(any(Player.class));
+        doNothing().when(militaryDao).save(any(Military.class));
+
+        Game game = gameService.newGame();
+
+        game.setPyramid(new HashMap<Integer, CardName>());
+        game.setAge(1);
+        game.setCurrentPlayerNumber(2);
+        game.getPlayer2().setMoney(3);
+        game.getTokensAvailable().clear();
+        game.getTokensAvailable().addAll(Set.of(ProgressToken.MASONRY, ProgressToken.ARCHITECTURE));
+        game.setStep(GameStep.CHOOSE_SCIENCE);
+
+        when(gameDao.findByCode("123")).thenReturn(game);
+
+        gameService.chooseProgressToken("123", ProgressToken.MASONRY);
+
+        assertEquals(2, game.getAge(), "Age should be 2.");
+        assertEquals(GameStep.PLAY_CARD, game.getStep(), "Game step should be PLAY_CARD.");
+        assertEquals(1, game.getCurrentPlayerNumber(), "Current player number should be 1.");
+        assertEquals(Set.of(ProgressToken.ARCHITECTURE), game.getTokensAvailable(), "Tokens available should be ARCHITECTURE.");
+        assertEquals(3, game.getPlayer2().getMoney(), "Money should be 3.");
+        assertPyramidContainsIndexesUpTo(game.getPyramid(), 19);
+        assertAllCardsInAge(game.getPyramid(), 2);
+
+        verify(gameDao, times(2)).save(game);
+        verify(playerDao, times(4)).save(any(Player.class));
+        verify(militaryDao, times(2)).save(game.getMilitary());
     }
 
     @Test
