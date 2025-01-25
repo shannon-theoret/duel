@@ -1,6 +1,7 @@
 package com.shannontheoret.duel.controller;
 
 import com.shannontheoret.duel.ProgressToken;
+import com.shannontheoret.duel.Wonder;
 import com.shannontheoret.duel.entity.Game;
 import com.shannontheoret.duel.exceptions.GameCodeNotFoundException;
 import com.shannontheoret.duel.exceptions.InvalidMoveException;
@@ -26,6 +27,16 @@ public class GameController {
     @PostMapping("newGame")
     public Game newGame() {
         return gameService.newGame();
+    }
+
+    @PostMapping("{gameCode}/selectWonder")
+    public Game selectWonder(@PathVariable("gameCode") String gameCode, @RequestParam Wonder wonder) throws GameCodeNotFoundException, InvalidMoveException {
+        return gameService.selectWonder(gameCode, wonder);
+    }
+
+    @PostMapping("{gameCode}/constructWonder")
+    public Game constructWonder(@PathVariable("gameCode") String gameCode, @RequestParam Integer index, @RequestParam Wonder wonder) throws GameCodeNotFoundException, InvalidMoveException {
+        return gameService.constructWonder(gameCode, index, wonder);
     }
 
     @PostMapping("{gameCode}/constructBuilding")

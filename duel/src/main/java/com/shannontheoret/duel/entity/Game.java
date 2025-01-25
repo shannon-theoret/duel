@@ -3,6 +3,7 @@ package com.shannontheoret.duel.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.shannontheoret.duel.CardDTO;
 import com.shannontheoret.duel.ProgressToken;
+import com.shannontheoret.duel.Wonder;
 import com.shannontheoret.duel.card.CardName;
 import com.shannontheoret.duel.GameStep;
 import com.shannontheoret.duel.exceptions.InvalidMoveException;
@@ -86,6 +87,45 @@ public class Game {
     @Column(name = "token", nullable = false)
     @Enumerated(EnumType.STRING)
     private Set<ProgressToken> tokensUnavailable;
+
+    @ElementCollection
+    @CollectionTable(
+            name = "tokens_from_unavailable",
+            joinColumns = @JoinColumn(
+                    name = "game_code",
+                    referencedColumnName = "code",
+                    foreignKey = @ForeignKey(name = "FK_tokens_from_unavailable_game")
+            )
+    )
+    @Column(name = "token", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private Set<ProgressToken> tokensFromUnavailable = EnumSet.noneOf(ProgressToken.class);
+
+    @ElementCollection
+    @CollectionTable(
+            name = "wonders_available",
+            joinColumns = @JoinColumn(
+                    name = "game_code",
+                    referencedColumnName = "code",
+                    foreignKey = @ForeignKey(name = "FK_wonders_available_game")
+            )
+    )
+    @Column(name = "wonder", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private Set<Wonder> wondersAvailable;
+
+    @ElementCollection
+    @CollectionTable(
+            name = "wonders_unavailable",
+            joinColumns = @JoinColumn(
+                    name = "game_code",
+                    referencedColumnName = "code",
+                    foreignKey = @ForeignKey(name = "FK_wonders_unavailable_game")
+            )
+    )
+    @Column(name = "wonder", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private Set<Wonder> wondersUnavailable;
 
     public Game() {
     }
@@ -181,8 +221,40 @@ public class Game {
         this.tokensUnavailable = tokensUnavailable;
     }
 
+    public Set<ProgressToken> getTokensFromUnavailable() {
+        return tokensFromUnavailable;
+    }
+
+    public void setTokensFromUnavailable(Set<ProgressToken> tokensFromUnavailable) {
+        this.tokensFromUnavailable = tokensFromUnavailable;
+    }
+
+    public Set<Wonder> getWondersAvailable() {
+        return wondersAvailable;
+    }
+
+    public void setWondersAvailable(Set<Wonder> wondersAvailable) {
+        this.wondersAvailable = wondersAvailable;
+    }
+
+    public Set<Wonder> getWondersUnavailable() {
+        return wondersUnavailable;
+    }
+
+    public void setWondersUnavailable(Set<Wonder> wondersUnavailable) {
+        this.wondersUnavailable = wondersUnavailable;
+    }
+
     public Map<Integer, CardDTO> getVisiblePyramid() {
         return PyramidUtility.generateVisiblePyramid(age, pyramid);
+    }
+
+    public void changeCurrentPlayer() {
+        if (currentPlayerNumber == 1) {
+            currentPlayerNumber = 2;
+        } else {
+            currentPlayerNumber = 1;
+        }
     }
 
     public Player findActivePlayer() throws InvalidMoveException {

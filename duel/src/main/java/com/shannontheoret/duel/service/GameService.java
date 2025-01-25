@@ -3,6 +3,7 @@ package com.shannontheoret.duel.service;
 import com.shannontheoret.duel.CardDTO;
 import com.shannontheoret.duel.GameStep;
 import com.shannontheoret.duel.ProgressToken;
+import com.shannontheoret.duel.Wonder;
 import com.shannontheoret.duel.card.*;
 import com.shannontheoret.duel.dao.GameDao;
 import com.shannontheoret.duel.dao.MilitaryDao;
@@ -49,7 +50,15 @@ public class GameService {
         game.setCode(generateCode());
         game.setAge(1);
         game.setCurrentPlayerNumber(1);
-        game.setStep(GameStep.PLAY_CARD);
+        game.setStep(GameStep.WONDER_SELECTION);
+        List<Wonder> allWonders = new ArrayList<>(List.of(Wonder.values()));
+        Collections.shuffle(allWonders);
+        EnumSet<Wonder> wondersAvailable = EnumSet.noneOf(Wonder.class);
+        wondersAvailable.addAll(allWonders.subList(0, 4));
+        game.setWondersAvailable(wondersAvailable);
+        EnumSet<Wonder> wondersUnavailable = EnumSet.noneOf(Wonder.class);
+        wondersUnavailable.addAll(allWonders.subList(4, 12));
+        game.setWondersUnavailable(wondersUnavailable);
         Player player1 = new Player();
         player1.setMoney(7);
         player1.setHand(new HashSet<>());
@@ -74,6 +83,104 @@ public class GameService {
     }
 
     @Transactional
+    public Game selectWonder(String code, Wonder wonder) throws GameCodeNotFoundException, InvalidMoveException {
+        Game game = findByCode(code);
+        confirmCorrectStep(game, GameStep.WONDER_SELECTION);
+        if (!game.getWondersAvailable().contains(wonder)) {
+            throw new InvalidMoveException("Wonder not available for selection.");
+        }
+        Player player = game.findActivePlayer();
+        player.selectWonder(wonder);
+        game.getWondersAvailable().remove(wonder);
+        if (game.getWondersAvailable().size() == 3) {
+            game.changeCurrentPlayer();
+            //if 2 wonders available player remains the same
+        } else if (game.getWondersAvailable().size() == 1) {
+            Wonder lastWonder = game.getWondersAvailable().iterator().next();
+            game.findNonActivePlayer().selectWonder(lastWonder);
+            game.getWondersAvailable().remove(lastWonder);
+            if (game.getWondersUnavailable().size() == 8) {
+                List<Wonder> remainingWonders = new ArrayList<>(game.getWondersUnavailable());
+                Collections.shuffle(remainingWonders);
+                game.getWondersAvailable().addAll(remainingWonders.subList(0,4));
+                game.getWondersUnavailable().clear();
+                game.getWondersUnavailable().addAll(remainingWonders.subList(4,8));
+            } else { //8 wonders have been selected
+                game.setStep(GameStep.PLAY_CARD);
+                game.setCurrentPlayerNumber(1);
+            }
+        }
+        save(game);
+        return game;
+    }
+
+    @Transactional
+    public Game constructWonder(String code, Integer cardIndex, Wonder wonder) throws GameCodeNotFoundException, InvalidMoveException {
+        Game game = findByCode(code);
+        confirmCorrectStep(game, GameStep.PLAY_CARD);
+        Player player = game.findActivePlayer();
+        confirmCardInVisiblePyramid(game, cardIndex);
+        if (!player.getWonders().containsKey(wonder)) {
+            throw new InvalidMoveException("Wonder not available to construct.");
+        }
+        if (player.hasWonder(wonder)) {
+            throw new InvalidMoveException("Wonder is already constructed.");
+        }
+        if ((player.calculateWondersConstructed().size() + game.findNonActivePlayer().calculateWondersConstructed().size()) == 7) {
+            throw new InvalidMoveException("A maximum of seven wonders can be constructed.");
+        }
+        Integer totalMonetaryCost = wonder.getCost().calculateTotalMonetaryCost(player.getHand(), game.findNonActivePlayer().getHand(), player.calculateWondersConstructed(), player.getTokens().contains(ProgressToken.ARCHITECTURE));
+        if (totalMonetaryCost > player.getMoney()) {
+            throw new InvalidMoveException("Player does not have enough money to make purchase");
+        }
+        player.setMoney(player.getMoney() - totalMonetaryCost);
+        if (game.findNonActivePlayer().getTokens().contains(ProgressToken.ECONOMY)) {
+            game.findNonActivePlayer().setMoney(game.findNonActivePlayer().getMoney() + totalMonetaryCost);
+        }
+        player.getWonders().put(wonder, game.getAge());
+        player.setMoney(player.getMoney() + wonder.getMonetaryGain());
+        if (wonder.getMilitaryGain() > 0) {
+            if (game.getCurrentPlayerNumber() == 1) {
+                game.getMilitary().setMilitaryPosition(game.getMilitary().getMilitaryPosition()+ wonder.getMilitaryGain());
+            } else {
+                game.getMilitary().setMilitaryPosition(game.getMilitary().getMilitaryPosition() - wonder.getMilitaryGain());
+            }
+            game.applyMilitaryEffect();
+        }
+        switch (wonder) {
+            case THE_APPIAN_WAY:
+                game.findNonActivePlayer().decreaseMoneyButNotIntoNegative(3);
+                break;
+            case CIRCUS_MAXIMUS:
+                game.setStep(GameStep.DESTROY_GREY);
+                break;
+            case THE_GREAT_LIBRARY:
+                List<ProgressToken> allUnavailableTokens = new ArrayList<>(game.getTokensUnavailable());
+                Collections.shuffle(allUnavailableTokens);
+                game.getTokensFromUnavailable().clear();
+                game.getTokensFromUnavailable().addAll(allUnavailableTokens.subList(0,3));
+                game.setStep(GameStep.CHOOSE_DISCARDED_SCIENCE);
+                break;
+            case THE_MAUSOLEUM:
+                game.setStep(GameStep.CONSTRUCT_FROM_DISCARD);
+                break;
+            case THE_STATUS_OF_ZEUS:
+                game.setStep(GameStep.DESTROY_BROWN);
+                break;
+            default:
+                break;
+
+        }
+        if (game.getStep() == GameStep.PLAY_CARD) {
+            Boolean immediatelyPlaySecondTurn = wonder.immediatelyPlaySecondTurn() || player.getTokens().contains(ProgressToken.THEOLOGY);
+            endTurn(game, immediatelyPlaySecondTurn);
+        }
+        game.getPyramid().remove(cardIndex);
+        save(game);
+        return game;
+    }
+
+    @Transactional
     public Game constructBuilding(String code, Integer cardIndex) throws GameCodeNotFoundException, InvalidMoveException {
         Game game = findByCode(code);
         confirmCorrectStep(game, GameStep.PLAY_CARD);
@@ -82,11 +189,11 @@ public class GameService {
         confirmCardInVisiblePyramid(game, cardIndex);
         CardName cardName = game.getPyramid().get(cardIndex);
         Boolean buildWithTwoFewer = (player.getTokens().contains(ProgressToken.MASONRY) && cardName.getCard().getCardType() == CardOrValueType.CIVILIAN_BUILDING);
-        Integer totalMonetaryCost = cardName.getCard().getCost().calculateTotalMonetaryCost(player.getHand(), game.findNonActivePlayer().getHand(), buildWithTwoFewer);
+        Integer totalMonetaryCost = cardName.getCard().getCost().calculateTotalMonetaryCost(player.getHand(), game.findNonActivePlayer().getHand(), player.calculateWondersConstructed(), buildWithTwoFewer);
         if (totalMonetaryCost > player.getMoney()) {
             throw new InvalidMoveException("Player does not have enough money to make purchase");
         }
-        if (opponent.getTokens().contains(ProgressToken.ECONOMY)) {
+        if (totalMonetaryCost != 0 && opponent.getTokens().contains(ProgressToken.ECONOMY)) {
             Integer totalTradeCost = totalMonetaryCost - cardName.getCard().getCost().getMonetaryCost();
             opponent.setMoney(opponent.getMoney() + totalTradeCost);
         }
@@ -270,10 +377,12 @@ public class GameService {
     }
 
     private static void endTurn(Game game) throws InvalidMoveException {
-        if (game.getCurrentPlayerNumber() == 1) {
-            game.setCurrentPlayerNumber(2);
-        } else {
-            game.setCurrentPlayerNumber(1);
+        endTurn(game, false);
+    }
+
+    private static void endTurn(Game game, Boolean immediatelyPlaySecondTurn) throws InvalidMoveException {
+        if (!immediatelyPlaySecondTurn) {
+            game.changeCurrentPlayer();
         }
         game.setStep(GameStep.PLAY_CARD);
         if (game.getPyramid().isEmpty()) {

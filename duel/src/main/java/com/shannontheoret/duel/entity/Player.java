@@ -2,10 +2,12 @@ package com.shannontheoret.duel.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.shannontheoret.duel.ProgressToken;
+import com.shannontheoret.duel.Wonder;
 import com.shannontheoret.duel.card.CardName;
 import com.shannontheoret.duel.card.CardOrValueType;
 import com.shannontheoret.duel.card.ScienceSymbol;
 import com.shannontheoret.duel.card.ScientificBuildingCard;
+import com.shannontheoret.duel.exceptions.InvalidMoveException;
 import jakarta.persistence.*;
 
 import java.util.*;
@@ -35,6 +37,18 @@ public class Player {
 
     @Column(name="money", nullable = false)
     private Integer money = 7;
+
+    @ElementCollection
+    @CollectionTable(
+            name="wonders",
+            joinColumns = @JoinColumn(
+                    name = "player_id",
+                    referencedColumnName = "id",
+                    foreignKey = @ForeignKey(name = "FK_player_wonders_player")))
+    @MapKeyColumn(name="wonder", nullable = false)
+    @Column(name="age", nullable = true)
+    @Enumerated(EnumType.STRING)
+    private Map<Wonder, Integer> wonders = new HashMap<>();
 
     @ElementCollection
     @CollectionTable(
@@ -99,6 +113,14 @@ public class Player {
         this.tokens = tokens;
     }
 
+    public Map<Wonder, Integer> getWonders() {
+        return wonders;
+    }
+
+    public void setWonders(Map<Wonder, Integer> wonders) {
+        this.wonders = wonders;
+    }
+
     public Boolean getWon() {
         return won;
     }
@@ -147,6 +169,30 @@ public class Player {
         return result;
     }
 
+    public void selectWonder(Wonder wonder) {
+        this.wonders.put(wonder, 0);
+    }
+
+    public void purchaseWonder(Wonder wonder, Integer age) throws InvalidMoveException {
+        if (!this.wonders.containsKey(wonder)) {
+            throw new InvalidMoveException("Wonder not available to player.");
+        }
+        if (age < 1 || age > 3) {
+            throw new InvalidMoveException("Age not valid.");
+        }
+        this.wonders.put(wonder, age);
+    }
+
+    public boolean hasWonder(Wonder wonder) {
+        return this.wonders.containsKey(wonder) && this.wonders.get(wonder) > 0;
+    }
+
+        public Set<Wonder> calculateWondersConstructed() {
+            return wonders.entrySet().stream()
+                    .filter(entry -> entry.getValue() > 0)
+                    .map(Map.Entry::getKey)
+                    .collect(Collectors.toSet());
+        }
     private Set<ScienceSymbol> collectAllScienceSymbols() {
         Set<ScienceSymbol> scienceSymbols = EnumSet.noneOf(ScienceSymbol.class);
         if(tokens.contains(ProgressToken.LAW)) {

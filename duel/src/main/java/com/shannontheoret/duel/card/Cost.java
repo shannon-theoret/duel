@@ -1,5 +1,7 @@
 package com.shannontheoret.duel.card;
 
+import com.shannontheoret.duel.Wonder;
+
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -51,10 +53,9 @@ public class Cost {
     }
 
     public Integer calculateTotalMonetaryCost(Set<CardName> playerHand, Set<CardName> opponentHand) {
-        return calculateTotalMonetaryCost(playerHand, opponentHand, false);
+        return calculateTotalMonetaryCost(playerHand, opponentHand, EnumSet.noneOf(Wonder.class), false);
     }
-
-    public Integer calculateTotalMonetaryCost(Set<CardName> playerHand, Set<CardName> opponentHand, Boolean buildWithTwoFewer) {
+    public Integer calculateTotalMonetaryCost(Set<CardName> playerHand, Set<CardName> opponentHand, Set<Wonder> wonders, Boolean buildWithTwoFewer) {
         if (constructForFree(playerHand)) {
             return 0;
         }
@@ -114,7 +115,24 @@ public class Cost {
                 }
             }
         }
-        //todo: include wonders
+        for (Wonder wonder : wonders) {
+            if (!wonder.getOneOfResources().isEmpty()) {
+                Set<Resource> resourcesLeftToPayAvailableFree = new HashSet<>(wonder.getOneOfResources());
+                resourcesLeftToPayAvailableFree.retainAll(resourcesLeftToPay);
+                if(!resourcesLeftToPayAvailableFree.isEmpty()) {
+                    Resource mostExpensiveResource = null;
+                    Integer mostExpensiveCost = 0;
+                    for(Resource resource : resourcesLeftToPayAvailableFree) {
+                        Integer cost = costToTrade.get(resource);
+                        if (cost > mostExpensiveCost) {
+                            mostExpensiveResource = resource;
+                            mostExpensiveCost = cost;
+                        }
+                    }
+                    resourcesLeftToPay.remove(mostExpensiveResource);
+                }
+            }
+        }
         for (CommercialBuildingCard yellow : commercialBuildingCardsInHand) {
             Set<Resource> resourcesLeftToPayAvailableFree = new HashSet<>(yellow.getOneOfResources());
             resourcesLeftToPayAvailableFree.retainAll(resourcesLeftToPay);
@@ -152,7 +170,7 @@ public class Cost {
                     }
                 }
                 resourcesLeftToPay.remove(mostExpensiveResource);
-                resourcesLeftToPay.remove(secondMostExpensiveCost);
+                resourcesLeftToPay.remove(secondMostExpensiveResource);
             } else {
                 return totalCost;
             }
@@ -166,4 +184,5 @@ public class Cost {
     public Boolean constructForFree(Set<CardName> playerHand) {
         return (freeBuildWith != null && playerHand.contains(freeBuildWith));
     }
+
 }
