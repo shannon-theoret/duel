@@ -1,6 +1,5 @@
 package com.shannontheoret.duel;
 
-import com.shannontheoret.duel.card.Card;
 import com.shannontheoret.duel.card.CardName;
 import com.shannontheoret.duel.dao.GameDao;
 import com.shannontheoret.duel.dao.MilitaryDao;
@@ -299,7 +298,7 @@ public class GameServiceTest {
         game.setCurrentPlayerNumber(2);
         game.getPlayer1().setMoney(10);
         game.getPlayer2().setMoney(6);
-        game.getPlayer1().getHand().addAll(Set.of(CardName.CLAY_PIT, CardName.LUMBER_YARD));
+        game.getPlayer1().getHand().addAll(Set.of(CardName.CLAY_PIT, CardName.LUMBER_YARD, CardName.PRESS));
         game.getPlayer2().getHand().addAll(Set.of(CardName.STONE_PIT, CardName.CLAY_POOL));
         game.getMilitary().setMilitaryPosition(2);
         game.getPlayer1().getTokens().addAll(Set.of(ProgressToken.ARCHITECTURE, ProgressToken.ECONOMY));
@@ -354,7 +353,8 @@ public class GameServiceTest {
 
         assertEquals(1, game.getCurrentPlayerNumber(), "Current player number should be 1.");
         assertEquals(0, game.getPlayer1().getMoney(), "Player 1 money should be 0.");
-        assertEquals(GameStep.CHOOSE_DISCARDED_SCIENCE, game.getStep(), "Game step should be CHOOSE_DISCARDED_SCIENCE.");
+        assertEquals(GameStep.CHOOSE_PROGRESS_TOKEN_FROM_DISCARD, game.getStep(), "Game step should be CHOOSE_PROGRESS_TOKEN_FROM_DISCARD.");
+        assertEquals(3, game.getTokensFromUnavailable().size(), "Tokens from unavailable should have three tokens.");
 
         verify(gameDao, times(2)).save(game);
         verify(playerDao, times(4)).save(any(Player.class));
@@ -417,13 +417,14 @@ public class GameServiceTest {
                 Wonder.PIRAEUS, 1,
                 Wonder.THE_MAUSOLEUM, 1));
         game.getPlayer2().getHand().addAll(Set.of(CardName.QUARRY, CardName.PRESS, CardName.CLAY_RESERVE));
+        game.getPlayer1().getHand().addAll(Set.of(CardName.LUMBER_YARD, CardName.STONE_PIT));
         game.getPlayer2().setMoney(10);
         game.getMilitary().setMilitaryPosition(1);
         game.getPlayer2().getTokens().add(ProgressToken.STRATEGY); //Has no impact on wonder military gain
 
         when(gameDao.findByCode("123")).thenReturn(game);
 
-        assertEquals(3, Wonder.THE_STATUS_OF_ZEUS.getCost().calculateTotalMonetaryCost(game.getPlayer2().getHand(), game.getPlayer1().getHand(), game.getPlayer2().calculateWondersConstructed(), false));
+        assertEquals(4, Wonder.THE_STATUS_OF_ZEUS.getCost().calculateTotalMonetaryCost(game.getPlayer2().getHand(), game.getPlayer1().getHand(), game.getPlayer2().calculateWondersConstructed(), false));
 
         gameService.constructWonder("123", 19, Wonder.THE_STATUS_OF_ZEUS);
 
@@ -431,6 +432,41 @@ public class GameServiceTest {
         assertEquals(2, game.getCurrentPlayerNumber(), "Get current player number.");
         assertEquals(0, game.getMilitary().getMilitaryPosition(), "Military position should be 0.");
         assertTrue(game.getPlayer2().hasWonder(Wonder.THE_STATUS_OF_ZEUS), "Player 2 should have THE_STATUE_OF_ZEUS.");
+
+        verify(gameDao, times(2)).save(game);
+        verify(playerDao, times(4)).save(any(Player.class));
+        verify(militaryDao, times(2)).save(game.getMilitary());
+    }
+
+    @Test
+    public void constructWonder_mausoleum() throws InvalidMoveException, GameCodeNotFoundException {
+        doNothing().when(gameDao).save(any(Game.class));
+        doNothing().when(playerDao).save(any(Player.class));
+        doNothing().when(militaryDao).save(any(Military.class));
+
+        Game game = gameService.newGame();
+
+        game.setStep(GameStep.PLAY_CARD);
+        game.setCurrentPlayerNumber(2);
+        game.getPlayer2().getWonders().putAll(Map.of(
+                Wonder.THE_STATUS_OF_ZEUS, 0,
+                Wonder.THE_GREAT_LIBRARY, 0,
+                Wonder.PIRAEUS, 1,
+                Wonder.THE_MAUSOLEUM, 0));
+        game.getPlayer2().getHand().addAll(Set.of(CardName.QUARRY, CardName.PRESS, CardName.CLAY_RESERVE));
+        game.getPlayer1().getHand().addAll(Set.of(CardName.LUMBER_YARD, CardName.STONE_PIT));
+        game.getPlayer2().setMoney(10);
+        game.getDiscardedCards().addAll(Set.of(CardName.LOGGING_CAMP, CardName.PALISADE));
+
+        when(gameDao.findByCode("123")).thenReturn(game);
+
+        assertEquals(4, Wonder.THE_MAUSOLEUM.getCost().calculateTotalMonetaryCost(game.getPlayer2().getHand(), game.getPlayer1().getHand(), game.getPlayer2().calculateWondersConstructed(), false));
+
+        gameService.constructWonder("123", 19, Wonder.THE_MAUSOLEUM);
+
+        assertEquals(GameStep.CONSTRUCT_FROM_DISCARD, game.getStep(), "Game step should be CONSTRUCT_FROM_DISCARD.");
+        assertEquals(2, game.getCurrentPlayerNumber(), "Current player number should be 2.");
+        assertTrue(game.getPlayer2().hasWonder(Wonder.THE_MAUSOLEUM), "Player 2 should have THE_MAUSOLEUM.");
 
         verify(gameDao, times(2)).save(game);
         verify(playerDao, times(4)).save(any(Player.class));
@@ -923,7 +959,7 @@ public class GameServiceTest {
 
         gameService.constructBuilding("123", 0);
 
-        assertEquals(GameStep.CHOOSE_SCIENCE, game.getStep(), "Game step should be CHOOSE_SCIENCE.");
+        assertEquals(GameStep.CHOOSE_PROGRESS_TOKEN, game.getStep(), "Game step should be CHOOSE_PROGRESS_TOKEN.");
         assertEquals(1, game.getCurrentPlayerNumber(), "Current player number should be 1");
         assertEquals(2, game.getAge(), "Age should remain at 2");
         assertTrue(game.getPyramid().isEmpty(), "Pyramid should not have any cards.");
@@ -1337,6 +1373,110 @@ public class GameServiceTest {
     }
 
     @Test
+    public void constructBuildingFromDiscard_military_theology() throws InvalidMoveException, GameCodeNotFoundException {
+        doNothing().when(gameDao).save(any(Game.class));
+        doNothing().when(playerDao).save(any(Player.class));
+        doNothing().when(militaryDao).save(any(Military.class));
+
+        Game game = gameService.newGame();
+
+        game.setAge(2);
+        game.setPyramid(createAgeTwoPyramid());
+        game.setStep(GameStep.CONSTRUCT_FROM_DISCARD);
+        game.getDiscardedCards().addAll(Set.of(CardName.GARRISON, CardName.APOTHECARY, CardName.ALTER));
+        game.setCurrentPlayerNumber(1);
+        game.getPlayer1().getTokens().add(ProgressToken.THEOLOGY);
+        game.getMilitary().setMilitaryPosition(-2);
+        game.getPlayer1().setMoney(3);
+
+        when(gameDao.findByCode("123")).thenReturn(game);
+
+        gameService.constructBuildingFromDiscard("123", CardName.GARRISON);
+
+        assertEquals(1, game.getCurrentPlayerNumber(), "Current player number should be 1.");
+        assertEquals(-1, game.getMilitary().getMilitaryPosition(), "Military position should be -1.");
+        assertTrue(game.getPlayer1().getHand().contains(CardName.GARRISON), "Player hand should contain GARRISON.");
+        assertFalse(game.getDiscardedCards().contains(CardName.GARRISON), "Discard pile should not contain GARRISON.");
+        assertEquals(3, game.getPlayer1().getMoney(), "Player 1 money should be 3.");
+
+        verify(gameDao, times(2)).save(game);
+        verify(playerDao, times(4)).save(any(Player.class));
+        verify(militaryDao, times(2)).save(game.getMilitary());
+    }
+
+    @Test
+    public void constructBuildingFromDiscard_science() throws InvalidMoveException, GameCodeNotFoundException {
+        doNothing().when(gameDao).save(any(Game.class));
+        doNothing().when(playerDao).save(any(Player.class));
+        doNothing().when(militaryDao).save(any(Military.class));
+
+        Game game = gameService.newGame();
+
+        game.setAge(2);
+        game.setPyramid(createAgeTwoPyramid());
+        game.setStep(GameStep.CONSTRUCT_FROM_DISCARD);
+        game.getDiscardedCards().addAll(Set.of(CardName.GARRISON, CardName.APOTHECARY, CardName.ALTER));
+        game.setCurrentPlayerNumber(2);
+        game.getPlayer2().setMoney(4);
+
+        when(gameDao.findByCode("123")).thenReturn(game);
+
+        gameService.constructBuildingFromDiscard("123", CardName.APOTHECARY);
+
+        assertEquals(1, game.getCurrentPlayerNumber(), "Current player number should be 1.");
+        assertTrue(game.getPlayer2().getHand().contains(CardName.APOTHECARY), "Player hand should contain APOTHECARY.");
+        assertFalse(game.getDiscardedCards().contains(CardName.APOTHECARY), "Discard pile should not contain APOTHECARY.");
+
+        verify(gameDao, times(2)).save(game);
+        verify(playerDao, times(4)).save(any(Player.class));
+        verify(militaryDao, times(2)).save(game.getMilitary());
+    }
+
+    @Test
+    public void constructBuildingFromDiscard_notInDiscard_throwsInvalidMoveException() throws InvalidMoveException, GameCodeNotFoundException {
+        doNothing().when(gameDao).save(any(Game.class));
+        doNothing().when(playerDao).save(any(Player.class));
+        doNothing().when(militaryDao).save(any(Military.class));
+
+        Game game = gameService.newGame();
+
+        game.setAge(2);
+        game.setPyramid(createAgeTwoPyramid());
+        game.setStep(GameStep.CONSTRUCT_FROM_DISCARD);
+        game.getDiscardedCards().addAll(Set.of(CardName.GARRISON, CardName.ALTER));
+        game.setCurrentPlayerNumber(2);
+        game.getPlayer2().setMoney(4);
+
+        when(gameDao.findByCode("123")).thenReturn(game);
+
+        assertThrows(InvalidMoveException.class, () -> gameService.constructBuildingFromDiscard("123", CardName.APOTHECARY), "Should throw InvalidMoveException.");
+
+        verify(gameDao, times(1)).save(game);
+        verify(playerDao, times(2)).save(any(Player.class));
+        verify(militaryDao, times(1)).save(game.getMilitary());
+    }
+
+    @Test
+    public void constructBuildingFromDiscard_wrongStep_throwsInvalidMoveException() throws InvalidMoveException, GameCodeNotFoundException {
+        doNothing().when(gameDao).save(any(Game.class));
+        doNothing().when(playerDao).save(any(Player.class));
+        doNothing().when(militaryDao).save(any(Military.class));
+
+        Game game = gameService.newGame();
+
+        game.setStep(GameStep.PLAY_CARD);
+        game.getDiscardedCards().addAll(Set.of(CardName.GARRISON, CardName.ALTER));
+
+        when(gameDao.findByCode("123")).thenReturn(game);
+
+        assertThrows(InvalidMoveException.class, () -> gameService.constructBuildingFromDiscard("123", CardName.ALTER), "Should throw InvalidMoveException.");
+
+        verify(gameDao, times(1)).save(game);
+        verify(playerDao, times(2)).save(any(Player.class));
+        verify(militaryDao, times(1)).save(game.getMilitary());
+    }
+
+    @Test
     public void chooseProgressToken_valid() throws InvalidMoveException, GameCodeNotFoundException {
         doNothing().when(gameDao).save(any(Game.class));
         doNothing().when(playerDao).save(any(Player.class));
@@ -1355,7 +1495,7 @@ public class GameServiceTest {
         game.getPlayer2().setMoney(4);
         game.setCurrentPlayerNumber(1);
 
-        game.setStep(GameStep.CHOOSE_SCIENCE);
+        game.setStep(GameStep.CHOOSE_PROGRESS_TOKEN);
 
         when(gameDao.findByCode("123")).thenReturn(game);
 
@@ -1391,7 +1531,7 @@ public class GameServiceTest {
         game.getPlayer2().setMoney(3);
         game.getTokensAvailable().clear();
         game.getTokensAvailable().addAll(Set.of(ProgressToken.MASONRY, ProgressToken.ARCHITECTURE));
-        game.setStep(GameStep.CHOOSE_SCIENCE);
+        game.setStep(GameStep.CHOOSE_PROGRESS_TOKEN);
 
         when(gameDao.findByCode("123")).thenReturn(game);
 
@@ -1455,7 +1595,7 @@ public class GameServiceTest {
         game.getPlayer1().getTokens().addAll(Set.of(ProgressToken.ECONOMY));
         game.getPlayer2().getTokens().addAll(Set.of(ProgressToken.URBANISM));
 
-        game.setStep(GameStep.CHOOSE_SCIENCE);
+        game.setStep(GameStep.CHOOSE_PROGRESS_TOKEN);
 
         when(gameDao.findByCode("123")).thenReturn(game);
 
@@ -1487,7 +1627,7 @@ public class GameServiceTest {
         game.getPlayer2().getHand().addAll(Set.of(CardName.DISPENSARY, CardName.LIBRARY, CardName.OBSERVATORY, CardName.STUDY, CardName.APOTHECARY, CardName.ALTER, CardName.LUMBER_YARD));
 
 
-        game.setStep(GameStep.CHOOSE_SCIENCE);
+        game.setStep(GameStep.CHOOSE_PROGRESS_TOKEN);
 
         when(gameDao.findByCode("123")).thenReturn(game);
 
@@ -1515,7 +1655,7 @@ public class GameServiceTest {
         game.getTokensUnavailable().clear();
         game.getTokensUnavailable().addAll(Set.of(ProgressToken.ARCHITECTURE, ProgressToken.ECONOMY, ProgressToken.URBANISM, ProgressToken.PHILOSOPHY, ProgressToken.THEOLOGY));
 
-        game.setStep(GameStep.CHOOSE_SCIENCE);
+        game.setStep(GameStep.CHOOSE_PROGRESS_TOKEN);
 
         game.getPlayer1().setMoney(8);
         game.getPlayer2().setMoney(2);
@@ -1553,7 +1693,7 @@ public class GameServiceTest {
         game.getTokensUnavailable().clear();
         game.getTokensUnavailable().addAll(Set.of(ProgressToken.ARCHITECTURE, ProgressToken.ECONOMY, ProgressToken.LAW, ProgressToken.PHILOSOPHY, ProgressToken.THEOLOGY));
 
-        game.setStep(GameStep.CHOOSE_SCIENCE);
+        game.setStep(GameStep.CHOOSE_PROGRESS_TOKEN);
 
         game.getPlayer1().setMoney(4);
         game.getPlayer2().setMoney(0);
@@ -1763,6 +1903,201 @@ public class GameServiceTest {
         when(gameDao.findByCode("123")).thenReturn(game);
 
         assertThrows(InvalidMoveException.class, () -> gameService.discard("123", 6), "Should throw InvalidMoveException");
+
+        verify(gameDao, times(1)).save(game);
+        verify(playerDao, times(2)).save(any(Player.class));
+        verify(militaryDao, times(1)).save(game.getMilitary());
+    }
+
+    @Test
+    public void destroyCard_brown() throws InvalidMoveException, GameCodeNotFoundException {
+        doNothing().when(gameDao).save(any(Game.class));
+        doNothing().when(playerDao).save(any(Player.class));
+        doNothing().when(militaryDao).save(any(Military.class));
+
+        Game game = gameService.newGame();
+
+        game.setCurrentPlayerNumber(1);
+        game.getPlayer1().getHand().addAll(Set.of(CardName.ALTER));
+        game.getPlayer2().getHand().addAll(Set.of(CardName.QUARRY, CardName.DISPENSARY));
+        game.setStep(GameStep.DESTROY_BROWN);
+        game.getDiscardedCards().add(CardName.THEATRE);
+
+        when(gameDao.findByCode("123")).thenReturn(game);
+
+        gameService.destroyCard("123", CardName.QUARRY);
+
+        assertEquals(GameStep.PLAY_CARD, game.getStep(), "Game step should be PLAY_CARD.");
+        assertEquals(2, game.getCurrentPlayerNumber(), "Current player number should be 2.");
+        assertEquals(Set.of(CardName.ALTER), game.getPlayer1().getHand(), "Player 1 hand should not change.");
+        assertEquals(Set.of(CardName.DISPENSARY), game.getPlayer2().getHand(), "Player 2 should only have DISPENSARY.");
+        assertEquals(Set.of(CardName.THEATRE, CardName.QUARRY), game.getDiscardedCards(), "Discard pile should have added QUARRY.");
+
+        verify(gameDao, times(2)).save(game);
+        verify(playerDao, times(4)).save(any(Player.class));
+        verify(militaryDao, times(2)).save(game.getMilitary());
+    }
+
+    @Test
+    public void destroyCard_cardMismatch_throwsInvalidMoveException() throws InvalidMoveException, GameCodeNotFoundException {
+        doNothing().when(gameDao).save(any(Game.class));
+        doNothing().when(playerDao).save(any(Player.class));
+        doNothing().when(militaryDao).save(any(Military.class));
+
+        Game game = gameService.newGame();
+
+        game.setCurrentPlayerNumber(1);
+        game.getPlayer1().getHand().addAll(Set.of(CardName.ALTER));
+        game.getPlayer2().getHand().addAll(Set.of(CardName.QUARRY, CardName.DISPENSARY));
+        game.setStep(GameStep.DESTROY_GREY);
+        game.getDiscardedCards().add(CardName.THEATRE);
+
+        when(gameDao.findByCode("123")).thenReturn(game);
+
+        assertThrows(InvalidMoveException.class, () -> gameService.destroyCard("123", CardName.DISPENSARY), "Should throw InvalidMoveException.");
+
+        verify(gameDao, times(1)).save(game);
+        verify(playerDao, times(2)).save(any(Player.class));
+        verify(militaryDao, times(1)).save(game.getMilitary());
+    }
+
+    @Test
+    public void destroyCard_incorrectStep_throwsInvalidMoveException() throws InvalidMoveException, GameCodeNotFoundException {
+        doNothing().when(gameDao).save(any(Game.class));
+        doNothing().when(playerDao).save(any(Player.class));
+        doNothing().when(militaryDao).save(any(Military.class));
+
+        Game game = gameService.newGame();
+
+        game.setCurrentPlayerNumber(1);
+        game.getPlayer1().getHand().addAll(Set.of(CardName.ALTER));
+        game.getPlayer2().getHand().addAll(Set.of(CardName.QUARRY, CardName.DISPENSARY));
+        game.setStep(GameStep.PLAY_CARD);
+        game.getDiscardedCards().add(CardName.THEATRE);
+
+        when(gameDao.findByCode("123")).thenReturn(game);
+
+        assertThrows(InvalidMoveException.class, () -> gameService.destroyCard("123", CardName.QUARRY));
+
+        verify(gameDao, times(1)).save(game);
+        verify(playerDao, times(2)).save(any(Player.class));
+        verify(militaryDao, times(1)).save(game.getMilitary());
+    }
+
+    @Test
+    public void destroyCard_cardNotInOpponentHand() throws InvalidMoveException, GameCodeNotFoundException {
+        doNothing().when(gameDao).save(any(Game.class));
+        doNothing().when(playerDao).save(any(Player.class));
+        doNothing().when(militaryDao).save(any(Military.class));
+
+        Game game = gameService.newGame();
+
+        game.setCurrentPlayerNumber(2);
+        game.getPlayer1().getHand().addAll(Set.of(CardName.ALTER));
+        game.getPlayer2().getHand().addAll(Set.of(CardName.QUARRY, CardName.DISPENSARY));
+        game.setStep(GameStep.DESTROY_BROWN);
+        game.getDiscardedCards().add(CardName.THEATRE);
+
+        when(gameDao.findByCode("123")).thenReturn(game);
+
+        assertThrows(InvalidMoveException.class, () -> gameService.destroyCard("123", CardName.QUARRY), "Should throw InvalidMoveException");
+
+        verify(gameDao, times(1)).save(game);
+        verify(playerDao, times(2)).save(any(Player.class));
+        verify(militaryDao, times(1)).save(game.getMilitary());
+    }
+
+    @Test
+    public void chooseDiscardedScience_valid() throws InvalidMoveException, GameCodeNotFoundException {
+        doNothing().when(gameDao).save(any(Game.class));
+        doNothing().when(playerDao).save(any(Player.class));
+        doNothing().when(militaryDao).save(any(Military.class));
+
+        Game game = gameService.newGame();
+
+        game.setStep(GameStep.CHOOSE_PROGRESS_TOKEN_FROM_DISCARD);
+        game.setCurrentPlayerNumber(1);
+        game.getTokensFromUnavailable().addAll(Set.of(ProgressToken.MASONRY, ProgressToken.URBANISM, ProgressToken.AGRICULTURE));
+        game.getPlayer1().setMoney(5);
+
+        when(gameDao.findByCode("123")).thenReturn(game);
+
+        gameService.chooseProgressTokenFromDiscard("123", ProgressToken.AGRICULTURE);
+
+        assertEquals(GameStep.PLAY_CARD, game.getStep(), "Game step should be PLAY_CARD.");
+        assertEquals(2, game.getCurrentPlayerNumber(), "Current player number should be 2.");
+        assertEquals(11, game.getPlayer1().getMoney(), "Player 1 money should be 11.");
+        assertTrue(game.getPlayer1().getTokens().contains(ProgressToken.AGRICULTURE), "PLayer 1 should have AGRICULTURE token.");
+
+        verify(gameDao, times(2)).save(game);
+        verify(playerDao, times(4)).save(any(Player.class));
+        verify(militaryDao, times(2)).save(game.getMilitary());
+    }
+
+    @Test
+    public void chooseDiscardedScience_theology() throws InvalidMoveException, GameCodeNotFoundException {
+        doNothing().when(gameDao).save(any(Game.class));
+        doNothing().when(playerDao).save(any(Player.class));
+        doNothing().when(militaryDao).save(any(Military.class));
+
+        Game game = gameService.newGame();
+
+        game.setStep(GameStep.CHOOSE_PROGRESS_TOKEN_FROM_DISCARD);
+        game.setCurrentPlayerNumber(2);
+        game.getTokensFromUnavailable().addAll(Set.of(ProgressToken.MASONRY, ProgressToken.URBANISM, ProgressToken.AGRICULTURE));
+        game.getPlayer2().setMoney(5);
+        game.getPlayer2().getTokens().add(ProgressToken.THEOLOGY);
+
+        when(gameDao.findByCode("123")).thenReturn(game);
+
+        gameService.chooseProgressTokenFromDiscard("123", ProgressToken.URBANISM);
+
+        assertEquals(GameStep.PLAY_CARD, game.getStep(), "Game step should be PLAY_CARD.");
+        assertEquals(2, game.getCurrentPlayerNumber(), "Current player number should be 2.");
+        assertEquals(11, game.getPlayer2().getMoney(), "Player 2 money should be 11.");
+        assertTrue(game.getPlayer1().getTokens().add(ProgressToken.URBANISM), "PLayer 1 should have URBANISM token.");
+
+        verify(gameDao, times(2)).save(game);
+        verify(playerDao, times(4)).save(any(Player.class));
+        verify(militaryDao, times(2)).save(game.getMilitary());
+    }
+
+    @Test
+    public void chooseDiscardedScience_wrongStep() {
+        doNothing().when(gameDao).save(any(Game.class));
+        doNothing().when(playerDao).save(any(Player.class));
+        doNothing().when(militaryDao).save(any(Military.class));
+
+        Game game = gameService.newGame();
+
+        game.setStep(GameStep.CHOOSE_PROGRESS_TOKEN);
+        game.setCurrentPlayerNumber(2);
+        game.getTokensFromUnavailable().addAll(Set.of(ProgressToken.MASONRY, ProgressToken.URBANISM, ProgressToken.AGRICULTURE));
+
+        when(gameDao.findByCode("123")).thenReturn(game);
+
+        assertThrows(InvalidMoveException.class, () -> gameService.chooseProgressTokenFromDiscard("123", ProgressToken.MASONRY), "Should throw InvalidMoveException.");
+
+        verify(gameDao, times(1)).save(game);
+        verify(playerDao, times(2)).save(any(Player.class));
+        verify(militaryDao, times(1)).save(game.getMilitary());
+    }
+
+    @Test
+    public void chooseDiscardedScience_tokenUnavailable() {
+        doNothing().when(gameDao).save(any(Game.class));
+        doNothing().when(playerDao).save(any(Player.class));
+        doNothing().when(militaryDao).save(any(Military.class));
+
+        Game game = gameService.newGame();
+
+        game.setStep(GameStep.CHOOSE_PROGRESS_TOKEN_FROM_DISCARD);
+        game.setCurrentPlayerNumber(1);
+        game.getTokensFromUnavailable().addAll(Set.of(ProgressToken.MASONRY, ProgressToken.URBANISM, ProgressToken.AGRICULTURE));
+
+        when(gameDao.findByCode("123")).thenReturn(game);
+
+        assertThrows(InvalidMoveException.class, () -> gameService.chooseProgressTokenFromDiscard("123", ProgressToken.THEOLOGY), "Should throw InvalidMoveException.");
 
         verify(gameDao, times(1)).save(game);
         verify(playerDao, times(2)).save(any(Player.class));

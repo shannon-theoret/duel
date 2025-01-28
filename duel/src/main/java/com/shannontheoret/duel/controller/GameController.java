@@ -2,6 +2,7 @@ package com.shannontheoret.duel.controller;
 
 import com.shannontheoret.duel.ProgressToken;
 import com.shannontheoret.duel.Wonder;
+import com.shannontheoret.duel.card.CardName;
 import com.shannontheoret.duel.entity.Game;
 import com.shannontheoret.duel.exceptions.GameCodeNotFoundException;
 import com.shannontheoret.duel.exceptions.InvalidMoveException;
@@ -44,6 +45,11 @@ public class GameController {
         return gameService.constructBuilding(gameCode, index);
     }
 
+    @PostMapping("{gameCode}/constructBuildingFromDiscard")
+    public Game constructBuildingFromDiscard(@PathVariable("gameCode") String gameCode, @RequestParam CardName cardName) throws GameCodeNotFoundException, InvalidMoveException {
+        return gameService.constructBuildingFromDiscard(gameCode, cardName);
+    }
+
     @PostMapping("{gameCode}/discard")
     public Game discard(@PathVariable("gameCode") String gameCode, @RequestParam Integer index) throws GameCodeNotFoundException, InvalidMoveException {
         return gameService.discard(gameCode, index);
@@ -52,6 +58,16 @@ public class GameController {
     @PostMapping("{gameCode}/chooseProgressToken")
     public Game chooseProgressToken(@PathVariable("gameCode") String gameCode, @RequestParam ProgressToken progressToken) throws GameCodeNotFoundException, InvalidMoveException {
         return gameService.chooseProgressToken(gameCode, progressToken);
+    }
+
+    @PostMapping("{gameCode}/chooseScienceFromDiscard")
+    public Game chooseScienceFromDiscard(@PathVariable("gameCode") String gameCode, @RequestParam ProgressToken progressToken) throws GameCodeNotFoundException, InvalidMoveException {
+        return gameService.chooseProgressTokenFromDiscard(gameCode, progressToken);
+    }
+    
+    @PostMapping("{gameCode}/destroyCard")
+    public Game destroyCard(@PathVariable("gameCode") String gameCode, @RequestParam CardName cardName) throws GameCodeNotFoundException, InvalidMoveException {
+        return gameService.destroyCard(gameCode, cardName);
     }
 
     @PostMapping("{gameCode}/testStuff")

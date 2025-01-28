@@ -152,20 +152,26 @@ public class GameService {
                 game.findNonActivePlayer().decreaseMoneyButNotIntoNegative(3);
                 break;
             case CIRCUS_MAXIMUS:
-                game.setStep(GameStep.DESTROY_GREY);
+                if (game.findNonActivePlayer().getHand().stream().filter(cardName -> cardName.getCard().getCardType() == CardOrValueType.MANUFACTURED_GOOD).count() > 0) {
+                    game.setStep(GameStep.DESTROY_GREY);
+                }
                 break;
             case THE_GREAT_LIBRARY:
                 List<ProgressToken> allUnavailableTokens = new ArrayList<>(game.getTokensUnavailable());
                 Collections.shuffle(allUnavailableTokens);
                 game.getTokensFromUnavailable().clear();
                 game.getTokensFromUnavailable().addAll(allUnavailableTokens.subList(0,3));
-                game.setStep(GameStep.CHOOSE_DISCARDED_SCIENCE);
+                game.setStep(GameStep.CHOOSE_PROGRESS_TOKEN_FROM_DISCARD);
                 break;
             case THE_MAUSOLEUM:
-                game.setStep(GameStep.CONSTRUCT_FROM_DISCARD);
+                if (!game.getDiscardedCards().isEmpty()) {
+                    game.setStep(GameStep.CONSTRUCT_FROM_DISCARD);
+                }
                 break;
             case THE_STATUS_OF_ZEUS:
-                game.setStep(GameStep.DESTROY_BROWN);
+                if (game.findNonActivePlayer().getHand().stream().filter(cardName -> cardName.getCard().getCardType() == CardOrValueType.RAW_MATERIAL).count() > 0) {
+                    game.setStep(GameStep.DESTROY_BROWN);
+                }
                 break;
             default:
                 break;
@@ -198,75 +204,11 @@ public class GameService {
             opponent.setMoney(opponent.getMoney() + totalTradeCost);
         }
         player.setMoney(player.getMoney() - totalMonetaryCost);
-        Integer monetaryGain = 0;
         if (player.getTokens().contains(ProgressToken.URBANISM) && cardName.getCard().getCost().constructForFree(player.getHand())) {
-            monetaryGain += 4;
+            player.setMoney(player.getMoney() + 4);
         }
-        switch (cardName.getCard().getCardType()) {
-            case COMMERCIAL_BUILDING:
-                CommercialBuildingCard commercialBuildingCard = (CommercialBuildingCard) cardName.getCard();
-                if (commercialBuildingCard.getMoney() > 0) {
-                    if (commercialBuildingCard.getMoneyPerType() != null) {
-                        if (commercialBuildingCard.getMoneyPerType() == CardOrValueType.WONDER) {
-                            //TODO: calculate
-                        } else {
-                            monetaryGain = HandUtility.countNumberOfCardType(commercialBuildingCard.getMoneyPerType(), player.getHand()) * commercialBuildingCard.getMoney();
-                        }
-                    } else {
-                        monetaryGain = commercialBuildingCard.getMoney();
-                    }
-                }
-                break;
-            case GUILD:
-                GuildCard guildCard = (GuildCard) cardName.getCard();
-                switch (guildCard.getCardOrValueTypeForVictoryPoints()) {
-                    case MONEY:
-                        monetaryGain = guildCard.getMoneyPerValueType();
-                        break;
-                    case WONDER:
-                        //TODO calculate
-                        break;
-                    case RAW_MATERIAL_AND_MANUFACTURED_GOOD:
-                        Integer opponentCount = HandUtility.countNumberOfCardType(CardOrValueType.RAW_MATERIAL, game.findNonActivePlayer().getHand())
-                                + HandUtility.countNumberOfCardType(CardOrValueType.MANUFACTURED_GOOD, game.findNonActivePlayer().getHand());
-                        Integer playerCount = HandUtility.countNumberOfCardType(CardOrValueType.RAW_MATERIAL, player.getHand())
-                                + HandUtility.countNumberOfCardType(CardOrValueType.MANUFACTURED_GOOD, player.getHand());
-                        Integer maxCount = Math.max(opponentCount, playerCount);
-                        monetaryGain = maxCount * guildCard.getMoneyPerValueType();
-                        break;
-                    default:
-                        Integer otherPlayerCount = HandUtility.countNumberOfCardType(guildCard.getCardOrValueTypeForVictoryPoints(), game.findNonActivePlayer().getHand());
-                        Integer currentPlayerCount = HandUtility.countNumberOfCardType(guildCard.getCardOrValueTypeForVictoryPoints(), player.getHand());
-                        Integer maxCardCount = Math.max(otherPlayerCount, currentPlayerCount);
-                        monetaryGain = maxCardCount * guildCard.getMoneyPerValueType();
-                        break;
-                }
-                break;
-            case MILITARY_BUILDING:
-                MilitaryBuildingCard militaryBuildingCard = (MilitaryBuildingCard) cardName.getCard();
-                Integer militaryGain = militaryBuildingCard.getMilitaryGain();
-                if (player.getTokens().contains(ProgressToken.STRATEGY)) {
-                    militaryGain += 1;
-                }
-                if (game.getCurrentPlayerNumber() == 1) {
-                    game.getMilitary().setMilitaryPosition(game.getMilitary().getMilitaryPosition()+ militaryGain);
-                } else {
-                    game.getMilitary().setMilitaryPosition(game.getMilitary().getMilitaryPosition() - militaryGain);
-                }
-                game.applyMilitaryEffect();
-                break;
-            case SCIENTIFIC_BUILDING:
-                ScientificBuildingCard scientificBuildingCard = (ScientificBuildingCard) cardName.getCard();
-                if (player.checkNewScienceMatch(scientificBuildingCard.getScienceSymbol()) && !game.getTokensAvailable().isEmpty()) {
-                    game.setStep(GameStep.CHOOSE_SCIENCE);
-                }
-                break;
-            default:
-                break;
-        }
-        player.setMoney(player.getMoney() + monetaryGain);
+        buildingEffects(game, cardName);
         game.getPyramid().remove(cardIndex);
-        player.getHand().add(cardName);
         if (game.getStep() == GameStep.PLAY_CARD) {
             endTurn(game);
         }
@@ -275,16 +217,50 @@ public class GameService {
     }
 
     @Transactional
+    public Game constructBuildingFromDiscard(String code, CardName cardName) throws InvalidMoveException, GameCodeNotFoundException {
+        Game game = findByCode(code);
+        confirmCorrectStep(game, GameStep.CONSTRUCT_FROM_DISCARD);
+        if (!game.getDiscardedCards().contains(cardName)) {
+            throw new InvalidMoveException("Card not found in discard.");
+        }
+        Boolean immediateSecondTurn = game.findActivePlayer().getTokens().contains(ProgressToken.THEOLOGY);
+        buildingEffects(game, cardName);
+        game.getDiscardedCards().remove(cardName);
+        if (game.getStep() == GameStep.CONSTRUCT_FROM_DISCARD) {
+            endTurn(game, immediateSecondTurn);
+        }
+        save(game);
+        return game;
+    }
+
+    @Transactional
     public Game chooseProgressToken(String code, ProgressToken progressToken) throws GameCodeNotFoundException, InvalidMoveException {
         Game game = findByCode(code);
-        confirmCorrectStep(game, GameStep.CHOOSE_SCIENCE);
+        confirmCorrectStep(game, GameStep.CHOOSE_PROGRESS_TOKEN);
         if (!game.getTokensAvailable().contains(progressToken)) {
             throw new InvalidMoveException("Token not available to be chosen");
         }
         progressEffects(game, progressToken);
         game.getTokensAvailable().remove(progressToken);
-        if (game.getStep() == GameStep.CHOOSE_SCIENCE) {
+        if (game.getStep() == GameStep.CHOOSE_PROGRESS_TOKEN) {
             endTurn(game);
+        }
+        save(game);
+        return game;
+    }
+
+    @Transactional
+    public Game chooseProgressTokenFromDiscard(String code, ProgressToken progressToken) throws GameCodeNotFoundException, InvalidMoveException {
+        Game game = findByCode(code);
+        confirmCorrectStep(game, GameStep.CHOOSE_PROGRESS_TOKEN_FROM_DISCARD);
+        if (!game.getTokensFromUnavailable().contains(progressToken)) {
+            throw new InvalidMoveException("Token not available to be chosen.");
+        }
+        Boolean immediateSecondTurn = game.findActivePlayer().getTokens().contains(ProgressToken.THEOLOGY);
+        progressEffects(game, progressToken);
+        game.getTokensFromUnavailable().clear();
+        if (game.getStep() == GameStep.CHOOSE_PROGRESS_TOKEN_FROM_DISCARD) {
+            endTurn(game, immediateSecondTurn);
         }
         save(game);
         return game;
@@ -304,6 +280,31 @@ public class GameService {
         game.getPyramid().remove(cardIndex);
         game.getDiscardedCards().add(discardedCardName);
         endTurn(game);
+        save(game);
+        return game;
+    }
+
+    @Transactional
+    public Game destroyCard(String code, CardName card) throws GameCodeNotFoundException, InvalidMoveException {
+        Game game = findByCode(code);
+        if (game.getStep() != GameStep.DESTROY_BROWN && game.getStep() != GameStep.DESTROY_GREY) {
+            throw new InvalidMoveException("Incorrect game step for this move.");
+        }
+        if (card.getCard().getCardType() == CardOrValueType.RAW_MATERIAL) {
+            confirmCorrectStep(game, GameStep.DESTROY_BROWN);
+        } else if (card.getCard().getCardType() == CardOrValueType.MANUFACTURED_GOOD) {
+            confirmCorrectStep(game, GameStep.DESTROY_GREY);
+        } else {
+            throw new InvalidMoveException("Card is not the correct type for this game step.");
+        }
+        Player opponent = game.findNonActivePlayer();
+        if (!opponent.getHand().contains(card)) {
+            throw new InvalidMoveException("Opponent does not have this card in their hand.");
+        }
+        opponent.getHand().remove(card);
+        game.getDiscardedCards().add(card);
+        Boolean immediateSecondTurn = game.findActivePlayer().getTokens().contains(ProgressToken.THEOLOGY);
+        endTurn(game, immediateSecondTurn);
         save(game);
         return game;
     }
@@ -419,8 +420,6 @@ public class GameService {
         Player player = game.findActivePlayer();
         switch (progressToken) {
             case AGRICULTURE:
-                player.setMoney(player.getMoney() + 6);
-                break;
             case URBANISM:
                 player.setMoney(player.getMoney() + 6);
                 break;
@@ -432,6 +431,75 @@ public class GameService {
             game.setStep(GameStep.GAME_END);
             player.setWon(true);
         }
+    }
+
+    private static void buildingEffects(Game game, CardName cardName) throws InvalidMoveException {
+        Player player = game.findActivePlayer();
+        Integer monetaryGain = 0;
+        switch (cardName.getCard().getCardType()) {
+            case COMMERCIAL_BUILDING:
+                CommercialBuildingCard commercialBuildingCard = (CommercialBuildingCard) cardName.getCard();
+                if (commercialBuildingCard.getMoney() > 0) {
+                    if (commercialBuildingCard.getMoneyPerType() != null) {
+                        if (commercialBuildingCard.getMoneyPerType() == CardOrValueType.WONDER) {
+                            //TODO: calculate
+                        } else {
+                            monetaryGain = HandUtility.countNumberOfCardType(commercialBuildingCard.getMoneyPerType(), player.getHand()) * commercialBuildingCard.getMoney();
+                        }
+                    } else {
+                        monetaryGain = commercialBuildingCard.getMoney();
+                    }
+                }
+                break;
+            case GUILD:
+                GuildCard guildCard = (GuildCard) cardName.getCard();
+                switch (guildCard.getCardOrValueTypeForVictoryPoints()) {
+                    case MONEY:
+                        monetaryGain = guildCard.getMoneyPerValueType();
+                        break;
+                    case WONDER:
+                        //TODO calculate
+                        break;
+                    case RAW_MATERIAL_AND_MANUFACTURED_GOOD:
+                        Integer opponentCount = HandUtility.countNumberOfCardType(CardOrValueType.RAW_MATERIAL, game.findNonActivePlayer().getHand())
+                                + HandUtility.countNumberOfCardType(CardOrValueType.MANUFACTURED_GOOD, game.findNonActivePlayer().getHand());
+                        Integer playerCount = HandUtility.countNumberOfCardType(CardOrValueType.RAW_MATERIAL, player.getHand())
+                                + HandUtility.countNumberOfCardType(CardOrValueType.MANUFACTURED_GOOD, player.getHand());
+                        Integer maxCount = Math.max(opponentCount, playerCount);
+                        monetaryGain = maxCount * guildCard.getMoneyPerValueType();
+                        break;
+                    default:
+                        Integer otherPlayerCount = HandUtility.countNumberOfCardType(guildCard.getCardOrValueTypeForVictoryPoints(), game.findNonActivePlayer().getHand());
+                        Integer currentPlayerCount = HandUtility.countNumberOfCardType(guildCard.getCardOrValueTypeForVictoryPoints(), player.getHand());
+                        Integer maxCardCount = Math.max(otherPlayerCount, currentPlayerCount);
+                        monetaryGain = maxCardCount * guildCard.getMoneyPerValueType();
+                        break;
+                }
+                break;
+            case MILITARY_BUILDING:
+                MilitaryBuildingCard militaryBuildingCard = (MilitaryBuildingCard) cardName.getCard();
+                Integer militaryGain = militaryBuildingCard.getMilitaryGain();
+                if (player.getTokens().contains(ProgressToken.STRATEGY)) {
+                    militaryGain += 1;
+                }
+                if (game.getCurrentPlayerNumber() == 1) {
+                    game.getMilitary().setMilitaryPosition(game.getMilitary().getMilitaryPosition()+ militaryGain);
+                } else {
+                    game.getMilitary().setMilitaryPosition(game.getMilitary().getMilitaryPosition() - militaryGain);
+                }
+                game.applyMilitaryEffect();
+                break;
+            case SCIENTIFIC_BUILDING:
+                ScientificBuildingCard scientificBuildingCard = (ScientificBuildingCard) cardName.getCard();
+                if (player.checkNewScienceMatch(scientificBuildingCard.getScienceSymbol()) && !game.getTokensAvailable().isEmpty()) {
+                    game.setStep(GameStep.CHOOSE_PROGRESS_TOKEN);
+                }
+                break;
+            default:
+                break;
+        }
+        player.setMoney(player.getMoney() + monetaryGain);
+        player.getHand().add(cardName);
     }
 
 
