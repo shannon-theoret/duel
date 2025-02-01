@@ -5,9 +5,30 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  padding-top: 70px;
 }
 
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
+}
+
+header {
+  font-family: 'Optimus Princeps', serif;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  background: #007362;
+  z-index: 1000;
+  padding: 20px;
+  font-size: 30px;
+  color: #e0a038;
+}
+
+@font-face {
+  font-family: 'Optimus Princeps';
+  src: url('./assets/fonts/OptimusPrinceps.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
 }
