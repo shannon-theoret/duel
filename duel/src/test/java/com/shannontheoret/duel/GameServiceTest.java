@@ -92,7 +92,7 @@ public class GameServiceTest {
         game.getWondersAvailable().clear();
         game.getWondersAvailable().addAll(Set.of(Wonder.THE_APPIAN_WAY, Wonder.CIRCUS_MAXIMUS, Wonder.THE_COLOSSUS, Wonder.THE_GREAT_LIBRARY));
         game.getWondersUnavailable().clear();
-        game.getWondersUnavailable().addAll(Set.of(Wonder.THE_GREAT_LIGHTHOUSE, Wonder.THE_HANGING_GARDENS, Wonder.THE_MAUSOLEUM, Wonder.PIRAEUS, Wonder.THE_PYRAMIDS, Wonder.THE_SPHINX, Wonder.THE_STATUS_OF_ZEUS, Wonder.THE_TEMPLE_OF_ARTEMIS));
+        game.getWondersUnavailable().addAll(Set.of(Wonder.THE_GREAT_LIGHTHOUSE, Wonder.THE_HANGING_GARDENS, Wonder.THE_MAUSOLEUM, Wonder.PIRAEUS, Wonder.THE_PYRAMIDS, Wonder.THE_SPHINX, Wonder.THE_STATUE_OF_ZEUS, Wonder.THE_TEMPLE_OF_ARTEMIS));
         game.setCurrentPlayerNumber(1);
         game.setStep(GameStep.WONDER_SELECTION);
 
@@ -123,7 +123,7 @@ public class GameServiceTest {
         game.getWondersAvailable().clear();
         game.getWondersAvailable().addAll(Set.of(Wonder.THE_GREAT_LIGHTHOUSE, Wonder.THE_HANGING_GARDENS, Wonder.THE_MAUSOLEUM, Wonder.PIRAEUS));
         game.getWondersUnavailable().clear();
-        game.getWondersUnavailable().addAll(Set.of(Wonder.THE_PYRAMIDS, Wonder.THE_SPHINX, Wonder.THE_STATUS_OF_ZEUS, Wonder.THE_TEMPLE_OF_ARTEMIS));
+        game.getWondersUnavailable().addAll(Set.of(Wonder.THE_PYRAMIDS, Wonder.THE_SPHINX, Wonder.THE_STATUE_OF_ZEUS, Wonder.THE_TEMPLE_OF_ARTEMIS));
 
         gameService.selectWonder("123", Wonder.THE_GREAT_LIGHTHOUSE);
 
@@ -156,7 +156,7 @@ public class GameServiceTest {
         Game game = gameService.newGame();
 
         game.getWondersAvailable().clear();
-        game.getWondersAvailable().addAll(Set.of(Wonder.THE_PYRAMIDS, Wonder.THE_SPHINX, Wonder.THE_STATUS_OF_ZEUS));
+        game.getWondersAvailable().addAll(Set.of(Wonder.THE_PYRAMIDS, Wonder.THE_SPHINX, Wonder.THE_STATUE_OF_ZEUS));
         game.setStep(GameStep.PLAY_CARD);
 
         when(gameDao.findByCode("123")).thenReturn(game);
@@ -177,7 +177,7 @@ public class GameServiceTest {
         Game game = gameService.newGame();
 
         game.getWondersAvailable().clear();
-        game.getWondersAvailable().addAll(Set.of(Wonder.THE_PYRAMIDS, Wonder.THE_SPHINX, Wonder.THE_STATUS_OF_ZEUS));
+        game.getWondersAvailable().addAll(Set.of(Wonder.THE_PYRAMIDS, Wonder.THE_SPHINX, Wonder.THE_STATUE_OF_ZEUS));
         game.setStep(GameStep.WONDER_SELECTION);
 
         when(gameDao.findByCode("123")).thenReturn(game);
@@ -202,7 +202,7 @@ public class GameServiceTest {
                 Wonder.THE_APPIAN_WAY, 0,
                 Wonder.CIRCUS_MAXIMUS, 0,
                 Wonder.THE_SPHINX, 0,
-                Wonder.THE_STATUS_OF_ZEUS, 0
+                Wonder.THE_STATUE_OF_ZEUS, 0
                 ));
         game.setAge(1);
         game.setCurrentPlayerNumber(1);
@@ -245,7 +245,7 @@ public class GameServiceTest {
                 Wonder.THE_COLOSSUS, 0,
                 Wonder.CIRCUS_MAXIMUS, 0,
                 Wonder.THE_SPHINX, 1,
-                Wonder.THE_STATUS_OF_ZEUS, 0
+                Wonder.THE_STATUE_OF_ZEUS, 0
         ));
         game.setAge(2);
         game.setPyramid(createAgeTwoPyramid());
@@ -337,7 +337,7 @@ public class GameServiceTest {
                 Wonder.THE_GREAT_LIBRARY, 0,
                 Wonder.CIRCUS_MAXIMUS, 0,
                 Wonder.THE_SPHINX, 0,
-                Wonder.THE_STATUS_OF_ZEUS, 0
+                Wonder.THE_STATUE_OF_ZEUS, 0
         ));
         game.setAge(2);
         game.setPyramid(createAgeTwoPyramid());
@@ -374,7 +374,7 @@ public class GameServiceTest {
                 Wonder.THE_PYRAMIDS, 0,
                 Wonder.CIRCUS_MAXIMUS, 0,
                 Wonder.THE_SPHINX, 0,
-                Wonder.THE_STATUS_OF_ZEUS, 0
+                Wonder.THE_STATUE_OF_ZEUS, 0
         ));
         game.setAge(3);
         game.setPyramid(createAgeThreePyramid());
@@ -412,7 +412,7 @@ public class GameServiceTest {
         game.setStep(GameStep.PLAY_CARD);
         game.setCurrentPlayerNumber(2);
         game.getPlayer2().getWonders().putAll(Map.of(
-                Wonder.THE_STATUS_OF_ZEUS, 0,
+                Wonder.THE_STATUE_OF_ZEUS, 0,
                 Wonder.THE_GREAT_LIBRARY, 0,
                 Wonder.PIRAEUS, 1,
                 Wonder.THE_MAUSOLEUM, 1));
@@ -424,14 +424,14 @@ public class GameServiceTest {
 
         when(gameDao.findByCode("123")).thenReturn(game);
 
-        assertEquals(4, Wonder.THE_STATUS_OF_ZEUS.getCost().calculateTotalMonetaryCost(game.getPlayer2().getHand(), game.getPlayer1().getHand(), game.getPlayer2().calculateWondersConstructed(), false));
+        assertEquals(4, Wonder.THE_STATUE_OF_ZEUS.getCost().calculateTotalMonetaryCost(game.getPlayer2().getHand(), game.getPlayer1().getHand(), game.getPlayer2().calculateWondersConstructed(), false));
 
-        gameService.constructWonder("123", 19, Wonder.THE_STATUS_OF_ZEUS);
+        gameService.constructWonder("123", 19, Wonder.THE_STATUE_OF_ZEUS);
 
         assertEquals(GameStep.DESTROY_BROWN, game.getStep(), "Game step should be DESTROY_BROWN.");
         assertEquals(2, game.getCurrentPlayerNumber(), "Get current player number.");
         assertEquals(0, game.getMilitary().getMilitaryPosition(), "Military position should be 0.");
-        assertTrue(game.getPlayer2().hasWonder(Wonder.THE_STATUS_OF_ZEUS), "Player 2 should have THE_STATUE_OF_ZEUS.");
+        assertTrue(game.getPlayer2().hasWonder(Wonder.THE_STATUE_OF_ZEUS), "Player 2 should have THE_STATUE_OF_ZEUS.");
 
         verify(gameDao, times(2)).save(game);
         verify(playerDao, times(4)).save(any(Player.class));
@@ -449,7 +449,7 @@ public class GameServiceTest {
         game.setStep(GameStep.PLAY_CARD);
         game.setCurrentPlayerNumber(2);
         game.getPlayer2().getWonders().putAll(Map.of(
-                Wonder.THE_STATUS_OF_ZEUS, 0,
+                Wonder.THE_STATUE_OF_ZEUS, 0,
                 Wonder.THE_GREAT_LIBRARY, 0,
                 Wonder.PIRAEUS, 1,
                 Wonder.THE_MAUSOLEUM, 0));
@@ -484,7 +484,7 @@ public class GameServiceTest {
             game.setStep(GameStep.WONDER_SELECTION);
             game.setCurrentPlayerNumber(2);
             game.getPlayer2().getWonders().putAll(Map.of(
-                    Wonder.THE_STATUS_OF_ZEUS, 0,
+                    Wonder.THE_STATUE_OF_ZEUS, 0,
                     Wonder.THE_GREAT_LIBRARY, 0,
                     Wonder.CIRCUS_MAXIMUS, 0,
                     Wonder.THE_MAUSOLEUM, 0));
@@ -510,7 +510,7 @@ public class GameServiceTest {
             game.setStep(GameStep.PLAY_CARD);
             game.setCurrentPlayerNumber(2);
             game.getPlayer2().getWonders().putAll(Map.of(
-                    Wonder.THE_STATUS_OF_ZEUS, 0,
+                    Wonder.THE_STATUE_OF_ZEUS, 0,
                     Wonder.THE_GREAT_LIBRARY, 0,
                     Wonder.CIRCUS_MAXIMUS, 0,
                     Wonder.THE_MAUSOLEUM, 0));
@@ -536,7 +536,7 @@ public class GameServiceTest {
             game.setStep(GameStep.PLAY_CARD);
             game.setCurrentPlayerNumber(1);
             game.getPlayer1().getWonders().putAll(Map.of(
-                    Wonder.THE_STATUS_OF_ZEUS, 0,
+                    Wonder.THE_STATUE_OF_ZEUS, 0,
                     Wonder.THE_GREAT_LIBRARY, 0,
                     Wonder.CIRCUS_MAXIMUS, 0,
                     Wonder.THE_MAUSOLEUM, 0));
@@ -564,7 +564,7 @@ public class GameServiceTest {
         game.setStep(GameStep.PLAY_CARD);
         game.setCurrentPlayerNumber(2);
         game.getPlayer2().getWonders().putAll(Map.of(
-                Wonder.THE_STATUS_OF_ZEUS, 0,
+                Wonder.THE_STATUE_OF_ZEUS, 0,
                 Wonder.THE_GREAT_LIBRARY, 0,
                 Wonder.CIRCUS_MAXIMUS, 0,
                 Wonder.THE_MAUSOLEUM, 1));
@@ -590,7 +590,7 @@ public class GameServiceTest {
             game.setStep(GameStep.PLAY_CARD);
             game.setCurrentPlayerNumber(2);
             game.getPlayer2().getWonders().putAll(Map.of(
-                    Wonder.THE_STATUS_OF_ZEUS, 0,
+                    Wonder.THE_STATUE_OF_ZEUS, 0,
                     Wonder.THE_GREAT_LIBRARY, 0,
                     Wonder.CIRCUS_MAXIMUS, 0,
                     Wonder.THE_MAUSOLEUM, 1));
@@ -618,7 +618,7 @@ public class GameServiceTest {
         game.setAge(3);
         game.setCurrentPlayerNumber(2);
         game.getPlayer2().getWonders().putAll(Map.of(
-                Wonder.THE_STATUS_OF_ZEUS, 0,
+                Wonder.THE_STATUE_OF_ZEUS, 0,
                 Wonder.THE_GREAT_LIBRARY, 1,
                 Wonder.CIRCUS_MAXIMUS, 2,
                 Wonder.THE_MAUSOLEUM, 1));
@@ -632,7 +632,7 @@ public class GameServiceTest {
 
         when(gameDao.findByCode("123")).thenReturn(game);
 
-        assertThrows(InvalidMoveException.class, () -> gameService.constructWonder("123", 19, Wonder.THE_STATUS_OF_ZEUS));
+        assertThrows(InvalidMoveException.class, () -> gameService.constructWonder("123", 19, Wonder.THE_STATUE_OF_ZEUS));
 
         verify(gameDao, times(1)).save(game);
         verify(playerDao, times(2)).save(any(Player.class));

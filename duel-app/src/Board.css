@@ -1,94 +1,99 @@
 .board {
     position: relative;
     height: 820px;
-    width: 750px;
+    width: 610px;
 }
 
-.row1 {
-    position: absolute;
-    top: 10px;
-    z-index: 1;
-}
-
-.row2 {
-    position: absolute;
-    top: 110px;
-    z-index: 2;
-}
-.row3 {
-    position: absolute;
-    top: 210px;
-    z-index: 3;
-}
-.row4 {
-    position: absolute;
-    top: 310px;
-    z-index: 4;
-}
-.row5 {
-    position: absolute;
-    top: 410px;
-    z-index: 5;
-}
-.row6 {
-    position: absolute;
-    top: 510px;
-    z-index: 6;
-}
-.row7 {
-    position: absolute;
-    top: 610px;
-    z-index: 7;
-}
-.c1 {
-    position: absolute;
-    left: 10px
-}
-.c2 {
-    position: absolute;
-    left: 70px
-}
-.c3 {
-    position: absolute;
-    left: 130px
-}
-.c4 {
-    position: absolute;
-    left: 190px
-}
-.c5 {
-    position: absolute;
-    left: 250px
-}
-.c6 {
-    position: absolute;
-    left: 310px
-}
-
-.c7 {
-    position: absolute;
-    left: 370px
-}
-
-.c8 {
-    position: absolute;
-    left: 430px
-}
-
-.c9 {
-    position: absolute;
-    left: 490px
-}
-
-.c10 {
-    position: absolute;
-    left: 550px
-}
-
-.c11 {
-    position: absolute;
-    left: 610px
-}
+.board img {
+    width: 95px;
+    height: auto;
+  }
+  
+  .row1 {
+      position: absolute;
+      top: 10px;
+      z-index: 1;
+  }
+  
+  .row2 {
+      position: absolute;
+      top: 80px;
+      z-index: 2;
+  }
+  .row3 {
+      position: absolute;
+      top: 150px;
+      z-index: 3;
+  }
+  .row4 {
+      position: absolute;
+      top: 220px;
+      z-index: 4;
+  }
+  .row5 {
+      position: absolute;
+      top: 290px;
+      z-index: 5;
+  }
+  .row6 {
+      position: absolute;
+      top: 360px;
+      z-index: 6;
+  }
+  .row7 {
+      position: absolute;
+      top: 430px;
+      z-index: 7;
+  }
+  .c1 {
+      position: absolute;
+      left: 10px
+  }
+  .c2 {
+      position: absolute;
+      left: 65px
+  }
+  .c3 {
+      position: absolute;
+      left: 115px
+  }
+  .c4 {
+      position: absolute;
+      left: 165px
+  }
+  .c5 {
+      position: absolute;
+      left: 215px
+  }
+  .c6 {
+      position: absolute;
+      left: 265px
+  }
+  
+  .c7 {
+      position: absolute;
+      left: 315px
+  }
+  
+  .c8 {
+      position: absolute;
+      left: 365px
+  }
+  
+  .c9 {
+      position: absolute;
+      left: 415px
+  }
+  
+  .c10 {
+      position: absolute;
+      left: 465px
+  }
+  
+  .c11 {
+      position: absolute;
+      left: 515px
+  }
 
 .sel {
     border: 2px solid gold;

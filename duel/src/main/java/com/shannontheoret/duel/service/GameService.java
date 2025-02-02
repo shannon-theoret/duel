@@ -137,7 +137,7 @@ public class GameService {
         if (game.findNonActivePlayer().getTokens().contains(ProgressToken.ECONOMY)) {
             game.findNonActivePlayer().setMoney(game.findNonActivePlayer().getMoney() + totalMonetaryCost);
         }
-        player.getWonders().put(wonder, game.getAge());
+        player.purchaseWonder(wonder, game.getAge());
         player.setMoney(player.getMoney() + wonder.getMonetaryGain());
         if (wonder.getMilitaryGain() > 0) {
             if (game.getCurrentPlayerNumber() == 1) {
@@ -168,7 +168,7 @@ public class GameService {
                     game.setStep(GameStep.CONSTRUCT_FROM_DISCARD);
                 }
                 break;
-            case THE_STATUS_OF_ZEUS:
+            case THE_STATUE_OF_ZEUS:
                 if (game.findNonActivePlayer().getHand().stream().filter(cardName -> cardName.getCard().getCardType() == CardOrValueType.RAW_MATERIAL).count() > 0) {
                     game.setStep(GameStep.DESTROY_BROWN);
                 }
@@ -313,7 +313,14 @@ public class GameService {
     @Transactional
     public Game testStuff(String code) throws  GameCodeNotFoundException, InvalidMoveException {
         Game game = findByCode(code);
-        game.setPyramid(generateAgeTwoPyramid());
+        game.findActivePlayer().getWonders().clear();
+        game.findActivePlayer().getWonders().putAll(Map.of(
+                Wonder.THE_GREAT_LIBRARY, 0,
+                Wonder.CIRCUS_MAXIMUS, 0,
+                Wonder.THE_SPHINX, 0,
+                Wonder.THE_STATUE_OF_ZEUS, 0
+        ));
+        game.findActivePlayer().setMoney(20);
         save(game);
         return game;
     }

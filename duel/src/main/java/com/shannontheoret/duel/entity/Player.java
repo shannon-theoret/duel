@@ -187,12 +187,12 @@ public class Player {
         return this.wonders.containsKey(wonder) && this.wonders.get(wonder) > 0;
     }
 
-        public Set<Wonder> calculateWondersConstructed() {
+    public Set<Wonder> calculateWondersConstructed() {
             return wonders.entrySet().stream()
                     .filter(entry -> entry.getValue() > 0)
                     .map(Map.Entry::getKey)
                     .collect(Collectors.toSet());
-        }
+    }
     private Set<ScienceSymbol> collectAllScienceSymbols() {
         Set<ScienceSymbol> scienceSymbols = EnumSet.noneOf(ScienceSymbol.class);
         if(tokens.contains(ProgressToken.LAW)) {

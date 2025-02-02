@@ -1,11 +1,50 @@
 .game {
     display: flex;
   }
+
+  .error {
+    padding: 0.75rem 1.25rem;
+    margin-bottom: 1rem;
+    border: 1px solid transparent;
+    border-radius: 0.375rem;
+    color: #721c24;
+    background-color: #f8d7da;
+    border-color: #f5c6cb;
+  }
+
+  .collapsible-container {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      width: 100%;
+  }
+
+  .collapsible-header {
+    display: flex;
+    padding: 20px;
+    cursor: pointer;
+    align-self: left;
+    width: 100%;
+    justify-content: flex-start;
+    text-align: left;
+  }
+  
+  .collapsible-content {
+    padding: 10px;
+    display: none;
+    overflow: hidden;
+    transition: max-height 0.3s ease-out;
+  }
+  
+  .collapsible-content.open {
+    display: block;
+  }
   
   .gameInner1 {
     display: flex;
     flex-direction: column;
     align-items: center;
+    width: 600px;
   }
   
   .progress {
@@ -15,6 +54,7 @@
   .progress0, .progress1, .progress2, .progress3, .progress4 {
     position: absolute;
     top: 20px;
+    cursor: pointer;
   }
   
   .progress0 {
@@ -193,12 +233,16 @@
     width: 165px;
     height: 50px;
     position: relative;
+    gap: 5px;
   }
   
   
   .wonderCard {
     position: absolute;
     z-index: 2;
+    width: 155px;
+    height: auto;
+    cursor: pointer;
   }
   
   .wonderBack {
@@ -240,3 +284,37 @@
     flex-direction: column;
     margin: 10px;
   }
+
+  .discardPile img {
+    height: 150px;
+    width: auto;
+  }
+
+  .coin-container {
+    position: relative;
+    width: 30px;
+  }
+  
+  .coin {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+  
+  .coin-amount {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .coin-amount-text {
+    font-size: 15px;
+    font-weight: bold;
+    text-align: center;
+  }
+  

@@ -17,7 +17,7 @@ public enum Wonder {
     PIRAEUS(new Cost(List.of(Resource.BRICK, Resource.STONE, Resource.WOOD, Resource.WOOD)), true, 2, 0, new ArrayList<>(List.of(Resource.PAPYRUS, Resource.GLASS))),
     THE_PYRAMIDS(new Cost(List.of(Resource.PAPYRUS, Resource.STONE, Resource.STONE, Resource.STONE)), false, 9, 0),
     THE_SPHINX(new Cost(List.of(Resource.GLASS, Resource.GLASS, Resource.BRICK, Resource.STONE)),true, 6, 0),
-    THE_STATUS_OF_ZEUS(new Cost(List.of(Resource.PAPYRUS, Resource.PAPYRUS, Resource.BRICK, Resource.WOOD, Resource.STONE)), false, 3, 0, 1),
+    THE_STATUE_OF_ZEUS(new Cost(List.of(Resource.PAPYRUS, Resource.PAPYRUS, Resource.BRICK, Resource.WOOD, Resource.STONE)), false, 3, 0, 1),
     THE_TEMPLE_OF_ARTEMIS(new Cost(List.of(Resource.PAPYRUS, Resource.GLASS, Resource.STONE, Resource.WOOD)), true, 0,12);
 
     private final Cost cost;

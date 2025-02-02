@@ -8,6 +8,8 @@ import com.shannontheoret.duel.exceptions.GameCodeNotFoundException;
 import com.shannontheoret.duel.exceptions.InvalidMoveException;
 import com.shannontheoret.duel.service.GameService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -21,53 +23,88 @@ public class GameController {
     }
 
     @GetMapping("{gameCode}")
-    public Game getGame(@PathVariable("gameCode") String gameCode) throws GameCodeNotFoundException {
-        return gameService.findByCode(gameCode);
+    public ResponseEntity<Object> getGame(@PathVariable("gameCode") String gameCode) throws GameCodeNotFoundException {
+        try {
+            return ResponseEntity.ok(gameService.findByCode(gameCode));
+        } catch (GameCodeNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
     }
 
     @PostMapping("newGame")
-    public Game newGame() {
-        return gameService.newGame();
+    public ResponseEntity<Object> newGame() {
+       return ResponseEntity.ok(gameService.newGame());
     }
 
     @PostMapping("{gameCode}/selectWonder")
-    public Game selectWonder(@PathVariable("gameCode") String gameCode, @RequestParam Wonder wonder) throws GameCodeNotFoundException, InvalidMoveException {
-        return gameService.selectWonder(gameCode, wonder);
+    public ResponseEntity<Object> selectWonder(@PathVariable("gameCode") String gameCode, @RequestParam Wonder wonder) throws GameCodeNotFoundException, InvalidMoveException {
+        try {
+            return ResponseEntity.ok(gameService.selectWonder(gameCode, wonder));
+        } catch (GameCodeNotFoundException | InvalidMoveException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
     }
 
     @PostMapping("{gameCode}/constructWonder")
-    public Game constructWonder(@PathVariable("gameCode") String gameCode, @RequestParam Integer index, @RequestParam Wonder wonder) throws GameCodeNotFoundException, InvalidMoveException {
-        return gameService.constructWonder(gameCode, index, wonder);
-    }
+    public ResponseEntity<Object> constructWonder(@PathVariable("gameCode") String gameCode, @RequestParam Integer index, @RequestParam Wonder wonder) throws GameCodeNotFoundException, InvalidMoveException {
+        try {
+            return ResponseEntity.ok(gameService.constructWonder(gameCode, index, wonder));
+        } catch (GameCodeNotFoundException | InvalidMoveException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }     }
 
     @PostMapping("{gameCode}/constructBuilding")
-    public Game constructBuilding(@PathVariable("gameCode") String gameCode, @RequestParam Integer index) throws GameCodeNotFoundException, InvalidMoveException {
-        return gameService.constructBuilding(gameCode, index);
+    public ResponseEntity<Object> constructBuilding(@PathVariable("gameCode") String gameCode, @RequestParam Integer index) throws GameCodeNotFoundException, InvalidMoveException {
+        try {
+            return ResponseEntity.ok(gameService.constructBuilding(gameCode, index));
+        } catch (GameCodeNotFoundException | InvalidMoveException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
     }
 
     @PostMapping("{gameCode}/constructBuildingFromDiscard")
-    public Game constructBuildingFromDiscard(@PathVariable("gameCode") String gameCode, @RequestParam CardName cardName) throws GameCodeNotFoundException, InvalidMoveException {
-        return gameService.constructBuildingFromDiscard(gameCode, cardName);
+    public ResponseEntity<Object> constructBuildingFromDiscard(@PathVariable("gameCode") String gameCode, @RequestParam CardName cardName) throws GameCodeNotFoundException, InvalidMoveException {
+        try {
+            return ResponseEntity.ok(gameService.constructBuildingFromDiscard(gameCode, cardName));
+        } catch (GameCodeNotFoundException | InvalidMoveException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
     }
 
     @PostMapping("{gameCode}/discard")
-    public Game discard(@PathVariable("gameCode") String gameCode, @RequestParam Integer index) throws GameCodeNotFoundException, InvalidMoveException {
-        return gameService.discard(gameCode, index);
+    public ResponseEntity<Object> discard(@PathVariable("gameCode") String gameCode, @RequestParam Integer index) throws GameCodeNotFoundException, InvalidMoveException {
+        try {
+            return ResponseEntity.ok(gameService.discard(gameCode, index));
+        } catch (GameCodeNotFoundException | InvalidMoveException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
     }
 
     @PostMapping("{gameCode}/chooseProgressToken")
-    public Game chooseProgressToken(@PathVariable("gameCode") String gameCode, @RequestParam ProgressToken progressToken) throws GameCodeNotFoundException, InvalidMoveException {
-        return gameService.chooseProgressToken(gameCode, progressToken);
+    public ResponseEntity<Object> chooseProgressToken(@PathVariable("gameCode") String gameCode, @RequestParam ProgressToken progressToken) throws GameCodeNotFoundException, InvalidMoveException {
+        try {
+            return ResponseEntity.ok(gameService.chooseProgressToken(gameCode, progressToken));
+        } catch (GameCodeNotFoundException | InvalidMoveException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
     }
 
-    @PostMapping("{gameCode}/chooseScienceFromDiscard")
-    public Game chooseScienceFromDiscard(@PathVariable("gameCode") String gameCode, @RequestParam ProgressToken progressToken) throws GameCodeNotFoundException, InvalidMoveException {
-        return gameService.chooseProgressTokenFromDiscard(gameCode, progressToken);
+    @PostMapping("{gameCode}/chooseProgressTokenFromDiscard")
+    public ResponseEntity<Object> chooseProgressTokenFromDiscard(@PathVariable("gameCode") String gameCode, @RequestParam ProgressToken progressToken) throws GameCodeNotFoundException, InvalidMoveException {
+        try {
+            return ResponseEntity.ok(gameService.chooseProgressTokenFromDiscard(gameCode, progressToken));
+        } catch (GameCodeNotFoundException | InvalidMoveException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
     }
-    
+
     @PostMapping("{gameCode}/destroyCard")
-    public Game destroyCard(@PathVariable("gameCode") String gameCode, @RequestParam CardName cardName) throws GameCodeNotFoundException, InvalidMoveException {
-        return gameService.destroyCard(gameCode, cardName);
+    public ResponseEntity<Object> destroyCard(@PathVariable("gameCode") String gameCode, @RequestParam CardName cardName) throws GameCodeNotFoundException, InvalidMoveException {
+        try {
+            return ResponseEntity.ok(gameService.destroyCard(gameCode, cardName));
+        } catch (GameCodeNotFoundException | InvalidMoveException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
     }
 
     @PostMapping("{gameCode}/testStuff")

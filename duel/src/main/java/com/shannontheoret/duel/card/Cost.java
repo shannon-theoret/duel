@@ -55,7 +55,7 @@ public class Cost {
     public Integer calculateTotalMonetaryCost(Set<CardName> playerHand, Set<CardName> opponentHand) {
         return calculateTotalMonetaryCost(playerHand, opponentHand, EnumSet.noneOf(Wonder.class), false);
     }
-    public Integer calculateTotalMonetaryCost(Set<CardName> playerHand, Set<CardName> opponentHand, Set<Wonder> wonders, Boolean buildWithTwoFewer) {
+    public Integer  calculateTotalMonetaryCost(Set<CardName> playerHand, Set<CardName> opponentHand, Set<Wonder> wonders, Boolean buildWithTwoFewer) {
         if (constructForFree(playerHand)) {
             return 0;
         }

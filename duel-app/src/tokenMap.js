@@ -7,6 +7,7 @@ import philosophy from './img/philosophy.png';
 import strategy from './img/strategy.png';
 import theology from './img/theology.png';
 import urbanism from './img/urbanism.png';
+import mathematics from './img/mathematics.png';
 
 export const tokenImgMap = {
     "AGRICULTURE": agriculture,
@@ -14,6 +15,7 @@ export const tokenImgMap = {
     "ECONOMY": economy,
     "LAW": law,
     "MASONRY": masonry,
+    "MATHEMATICS": mathematics,
     "PHILOSOPHY": philosophy,
     "STRATEGY": strategy,
     "THEOLOGY": theology,
