@@ -66,6 +66,18 @@ public class Player {
     @Column(name="won", nullable = false)
     private Boolean won=false;
 
+    @ElementCollection
+    @CollectionTable(
+            name="score",
+            joinColumns = @JoinColumn(
+                    name = "player_id",
+                    referencedColumnName = "id",
+                    foreignKey = @ForeignKey(name = "FK_player_score_player")))
+    @MapKeyColumn(name="category", nullable = false)
+    @Column(name="score", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private Map<CardOrValueType, Integer> score = new HashMap<>();
+
     public Long getId() {
         return id;
     }
@@ -143,6 +155,14 @@ public class Player {
 
     public boolean checkNewScienceMatch(ScienceSymbol newSymbol) {
         return collectAllScienceSymbols().contains(newSymbol);
+    }
+
+    public Map<CardOrValueType, Integer> getScore() {
+        return score;
+    }
+
+    public void setScore(Map<CardOrValueType, Integer> score) {
+        this.score = score;
     }
 
     @Override

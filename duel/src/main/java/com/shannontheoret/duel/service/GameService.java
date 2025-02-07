@@ -14,6 +14,7 @@ import com.shannontheoret.duel.entity.Player;
 import com.shannontheoret.duel.exceptions.GameCodeNotFoundException;
 import com.shannontheoret.duel.exceptions.InvalidMoveException;
 import com.shannontheoret.duel.utility.HandUtility;
+import com.shannontheoret.duel.utility.ScoreUtility;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -313,15 +314,7 @@ public class GameService {
     @Transactional
     public Game testStuff(String code) throws  GameCodeNotFoundException, InvalidMoveException {
         Game game = findByCode(code);
-        game.findActivePlayer().getWonders().clear();
-        game.findActivePlayer().getWonders().putAll(Map.of(
-                Wonder.THE_GREAT_LIBRARY, 0,
-                Wonder.CIRCUS_MAXIMUS, 0,
-                Wonder.THE_SPHINX, 0,
-                Wonder.THE_STATUE_OF_ZEUS, 0
-        ));
-        game.findActivePlayer().setMoney(20);
-        save(game);
+        calculateScores(game);
         return game;
     }
 
@@ -405,12 +398,12 @@ public class GameService {
                     break;
                 case 3:
                     game.setStep(GameStep.GAME_END);
+                    calculateScores(game);
                     break;
                 default:
                     throw new InvalidMoveException("Age is not valid");
             }
         }
-        //todo: calculate winner
     }
 
     private static void confirmCardInVisiblePyramid(Game game, Integer cardIndex) throws InvalidMoveException {
@@ -463,6 +456,7 @@ public class GameService {
                 switch (guildCard.getCardOrValueTypeForVictoryPoints()) {
                     case MONEY:
                         monetaryGain = guildCard.getMoneyPerValueType();
+                        //TODO: is this correct?
                         break;
                     case WONDER:
                         //TODO calculate
@@ -513,6 +507,46 @@ public class GameService {
     private static void confirmCorrectStep(Game game, GameStep expectedStep) throws InvalidMoveException {
         if (game.getStep() != expectedStep) {
             throw new InvalidMoveException("Incorrect game step for this move");
+        }
+    }
+
+    private static void calculateScores(Game game) throws InvalidMoveException {
+        confirmCorrectStep(game, GameStep.GAME_END);
+        Map<CardOrValueType, Integer> player1Score = new EnumMap<CardOrValueType, Integer>(CardOrValueType.class);
+        player1Score.put(CardOrValueType.CIVILIAN_BUILDING, ScoreUtility.calculateSimpleCategoryScore(game.getPlayer1().getHand(), CardOrValueType.CIVILIAN_BUILDING));
+        player1Score.put(CardOrValueType.SCIENTIFIC_BUILDING, ScoreUtility.calculateSimpleCategoryScore(game.getPlayer1().getHand(), CardOrValueType.SCIENTIFIC_BUILDING));
+        player1Score.put(CardOrValueType.COMMERCIAL_BUILDING, ScoreUtility.calculateSimpleCategoryScore(game.getPlayer1().getHand(), CardOrValueType.COMMERCIAL_BUILDING));
+        player1Score.put(CardOrValueType.GUILD, ScoreUtility.calculateGuildScore(game.getPlayer1(), game.getPlayer2()));
+        player1Score.put(CardOrValueType.WONDER, ScoreUtility.calculateWonderScore(game.getPlayer1().calculateWondersConstructed()));
+        player1Score.put(CardOrValueType.PROGRESS_TOKEN, ScoreUtility.calculateProgressTokenScore(game.getPlayer1().getTokens()));
+        player1Score.put(CardOrValueType.MONEY, ScoreUtility.calculateMoneyScore(game.getPlayer1().getMoney()));
+        player1Score.put(CardOrValueType.MILITARY_BUILDING, ScoreUtility.calculatePlayer1MilitaryScore(game.getMilitary().getMilitaryPosition()));
+        game.getPlayer1().setScore(player1Score);
+        Integer player1Total = ScoreUtility.calculateTotal(player1Score);
+
+        Map<CardOrValueType, Integer> player2Score = new EnumMap<CardOrValueType, Integer>(CardOrValueType.class);
+        player2Score.put(CardOrValueType.CIVILIAN_BUILDING, ScoreUtility.calculateSimpleCategoryScore(game.getPlayer2().getHand(), CardOrValueType.CIVILIAN_BUILDING));
+        player2Score.put(CardOrValueType.SCIENTIFIC_BUILDING, ScoreUtility.calculateSimpleCategoryScore(game.getPlayer2().getHand(), CardOrValueType.SCIENTIFIC_BUILDING));
+        player2Score.put(CardOrValueType.COMMERCIAL_BUILDING, ScoreUtility.calculateSimpleCategoryScore(game.getPlayer2().getHand(), CardOrValueType.COMMERCIAL_BUILDING));
+        player2Score.put(CardOrValueType.GUILD, ScoreUtility.calculateGuildScore(game.getPlayer2(), game.getPlayer1()));
+        player2Score.put(CardOrValueType.WONDER, ScoreUtility.calculateWonderScore(game.getPlayer2().calculateWondersConstructed()));
+        player2Score.put(CardOrValueType.PROGRESS_TOKEN, ScoreUtility.calculateProgressTokenScore(game.getPlayer2().getTokens()));
+        player2Score.put(CardOrValueType.MONEY, ScoreUtility.calculateMoneyScore(game.getPlayer2().getMoney()));
+        player2Score.put(CardOrValueType.MILITARY_BUILDING, ScoreUtility.calculatePlayer2MilitaryScore(game.getMilitary().getMilitaryPosition()));
+        game.getPlayer2().setScore(player2Score);
+        Integer player2Total = ScoreUtility.calculateTotal(player2Score);
+
+        if(player1Total > player2Total) {
+            game.getPlayer1().setWon(true);
+        } else if (player2Total > player1Total) {
+            game.getPlayer2().setWon(true);
+        } else if (player1Score.get(CardOrValueType.CIVILIAN_BUILDING) > player2Score.get(CardOrValueType.CIVILIAN_BUILDING)) {
+            game.getPlayer1().setWon(true);
+        } else if (player2Score.get(CardOrValueType.CIVILIAN_BUILDING) > player1Score.get(CardOrValueType.CIVILIAN_BUILDING)) {
+            game.getPlayer2().setWon(true);
+        } else {
+            game.getPlayer1().setWon(true);
+            game.getPlayer2().setWon(true);
         }
     }
 

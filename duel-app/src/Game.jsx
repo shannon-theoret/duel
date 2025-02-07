@@ -153,7 +153,6 @@ export default function Game() {
 
     return (
       <>
-      <Button text="Test Stuff" onClick={testStuff}></Button>
       {errorMessage && <ErrorBox errorMessage={errorMessage}></ErrorBox>}
         {game.step !== "SETUP" && (
         <div className="game">  

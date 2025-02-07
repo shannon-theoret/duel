@@ -13,7 +13,8 @@ public enum CardOrValueType {
     GUILD,
     WONDER,
     MONEY,
-    RAW_MATERIAL_AND_MANUFACTURED_GOOD;
+    RAW_MATERIAL_AND_MANUFACTURED_GOOD,
+    PROGRESS_TOKEN;
 
     public static Set<CardOrValueType> getCardTypes() {
         return EnumSet.range(RAW_MATERIAL, GUILD);

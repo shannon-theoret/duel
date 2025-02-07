@@ -6,6 +6,7 @@ import com.shannontheoret.duel.ProgressToken;
 import com.shannontheoret.duel.Wonder;
 import com.shannontheoret.duel.card.CardName;
 import com.shannontheoret.duel.GameStep;
+import com.shannontheoret.duel.card.CardOrValueType;
 import com.shannontheoret.duel.exceptions.InvalidMoveException;
 import com.shannontheoret.duel.utility.PyramidUtility;
 import jakarta.persistence.*;
