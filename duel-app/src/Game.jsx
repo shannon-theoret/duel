@@ -17,7 +17,6 @@ export default function Game() {
 
     const [selectedCardIndex, setSelectedCardIndex] = useState(null);
     const [errorMessage, setErrorMessage] = useState("");
-    const [seeDiscard, setSeeDiscard] = useState(false);
 
     const {code} = useParams();
     

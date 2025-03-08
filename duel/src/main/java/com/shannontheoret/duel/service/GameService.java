@@ -442,7 +442,7 @@ public class GameService {
                 if (commercialBuildingCard.getMoney() > 0) {
                     if (commercialBuildingCard.getMoneyPerType() != null) {
                         if (commercialBuildingCard.getMoneyPerType() == CardOrValueType.WONDER) {
-                            //TODO: calculate
+                            monetaryGain = player.calculateWondersConstructed().size() * commercialBuildingCard.getMoney();
                         } else {
                             monetaryGain = HandUtility.countNumberOfCardType(commercialBuildingCard.getMoneyPerType(), player.getHand()) * commercialBuildingCard.getMoney();
                         }
@@ -455,11 +455,10 @@ public class GameService {
                 GuildCard guildCard = (GuildCard) cardName.getCard();
                 switch (guildCard.getCardOrValueTypeForVictoryPoints()) {
                     case MONEY:
-                        monetaryGain = guildCard.getMoneyPerValueType();
-                        //TODO: is this correct?
+                        monetaryGain = guildCard.getMoneyPerValueType(); //0
                         break;
                     case WONDER:
-                        //TODO calculate
+                        monetaryGain = guildCard.getMoneyPerValueType() * player.calculateWondersConstructed().size();
                         break;
                     case RAW_MATERIAL_AND_MANUFACTURED_GOOD:
                         Integer opponentCount = HandUtility.countNumberOfCardType(CardOrValueType.RAW_MATERIAL, game.findNonActivePlayer().getHand())
