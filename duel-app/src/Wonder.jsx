@@ -11,8 +11,8 @@ export default function Wonder({wonderName, onClickWonder, wonderBackAge}) {
         3: ageThreeBackSide
     }
     return (<div className="wonder">
-        <img className="wonderCard" src={wonderImgMap[wonderName]} onClick={onClickWonder}/>
+        <img className="wonder-card" src={wonderImgMap[wonderName]} onClick={onClickWonder}/>
         {wonderBackAge != 0 &&
-        <img class="wonderBack" src={cardBackMap[wonderBackAge]}></img>}
+        <img className="wonder-back" src={cardBackMap[wonderBackAge]}></img>}
     </div>);
 }

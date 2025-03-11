@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 
-
 export default function Collapsible({ children, label, defaultOpen}) {
   const [isOpen, setIsOpen] = useState(defaultOpen);
 

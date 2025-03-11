@@ -2,9 +2,9 @@ import Card from "./Card"
 
 export default function DiscardPile({cards, constructFromDiscard}) {
     return (
-        <div className="discardPile">
+        <div className="discard-pile">
             {cards.map((cardName) =>
-                <Card cardName={cardName} otherOnClick={constructFromDiscard}></Card>
+                <Card key={cardName} cardName={cardName} otherOnClick={constructFromDiscard}></Card>
             )}
         </div>
     )

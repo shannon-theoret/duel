@@ -92,7 +92,7 @@ export default function Game() {
             handleChooseProgressToken={handleChooseProgressToken} 
             handleConstructFromDiscard={handleConstructFromDiscard} 
           />
-          <div className="gameInner2">
+          <div className="game-inner2">
             <PlayerMoves 
               game={game} 
               selectedCardIndex={selectedCardIndex} 

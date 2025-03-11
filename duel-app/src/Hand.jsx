@@ -4,9 +4,8 @@ import Wonder from './Wonder';
 import Coin from './Coin';
 
 export default function Hand({money, wonders, tokens, sortedHand, onClickWonder, destroyCard}) {
-
   return (
-    <div className="playerHand">
+    <div className="player-hand">
         <Coin money={money}></Coin>
       <Tokens tokens={tokens}></Tokens>
       <div className="wonders">
@@ -14,18 +13,18 @@ export default function Hand({money, wonders, tokens, sortedHand, onClickWonder,
         <Wonder 
             key={wonderName} 
             wonderName={wonderName} 
-            onClickWonder={() => onClickWonder(wonderName)} 
+            onClickWonder={onClickWonder ? () => onClickWonder(wonderName) : null} 
             wonderBackAge={age}
         />
         ))}
       </div>
-      <div className="playerCards">
+      <div className="player-cards">
       {Object.values(sortedHand).map((items, index) => (
-          <div className="cardColumn" key={index}>
+          <div className="card-column" key={index}>
             {items.map((item) => (
               <Card 
                 key={item} 
-                cName="playerCard" 
+                cName="player-card" 
                 cardName={item}
                 otherOnClick={destroyCard} 
                 />

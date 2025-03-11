@@ -6,7 +6,7 @@ import Tokens from "./Tokens";
 
 export default function GameBoard({ game, setSelectedCardIndex, selectedCardIndex, handleChooseProgressTokenFromDiscard, handleChooseProgressToken, handleConstructFromDiscard }) {
   return (
-    <div className="gameInner1">
+    <div className="game-inner1">
       {game.step === "CHOOSE_PROGRESS_TOKEN_FROM_DISCARD" &&
         <Tokens tokens={game.tokensFromUnavailable} onClickToken={handleChooseProgressTokenFromDiscard}></Tokens>}
       <Progress chooseScience={game.step === "CHOOSE_PROGRESS_TOKEN"} military={game.military} tokensAvailable={game.tokensAvailable} onTokenClick={handleChooseProgressToken}></Progress>

@@ -17,10 +17,10 @@ export default function Progress({military, tokensAvailable, onTokenClick, choos
         <img src={progressBar}></img>
         <img className={`military${military.militaryPosition}`} src={militaryToken}></img>
         {tokenImgs}
-        {military.loot5Player1Available && <img className='loot5Player1Available' src={broken5left}></img>}
-        {military.loot5Player2Available && <img className='loot5Player2Available' src={broken5right}></img>}
-        {military.loot2Player1Available && <img className='loot2Player1Available' src={broken2left}></img>}
-        {military.loot2Player2Available && <img className='loot2Player2Available' src={broken2right}></img>}
+        {military.loot5Player1Available && <img className='loot5-player1-available' src={broken5left}></img>}
+        {military.loot5Player2Available && <img className='loot5-player2-available' src={broken5right}></img>}
+        {military.loot2Player1Available && <img className='loot2-player1-available' src={broken2left}></img>}
+        {military.loot2Player2Available && <img className='loot2-player2-available' src={broken2right}></img>}
     </div>
     )
 }

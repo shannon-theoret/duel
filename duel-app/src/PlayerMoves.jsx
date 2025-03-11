@@ -4,7 +4,7 @@ import Button from "./Button";
 
 export default function PlayerMoves({ game, selectedCardIndex, handleConstructBuilding, handleDiscard, handleSelectWonder, handleConstructWonder, handleDestroyCard }) {
     return (
-        <div className="playerMoves">
+        <div className="player-moves">
             <Instructions step={game.step} currentPlayerNumber={game.currentPlayerNumber} cardSelected={selectedCardIndex}></Instructions>
             {game.step === "WONDER_SELECTION" ?
                 (<WonderSelection wonders={game.wondersAvailable} selectWonder={handleSelectWonder}></WonderSelection>) : null}
