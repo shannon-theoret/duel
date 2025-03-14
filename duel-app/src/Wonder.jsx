@@ -2,6 +2,7 @@ import { wonderImgMap } from "./wonderMap";
 import ageOneBackSide from './img/ageOneBackSide.jpg';
 import ageTwoBackSide from './img/ageTwoBackSide.jpg';
 import ageThreeBackSide from './img/ageThreeBackSide.jpg';
+import Tooltip from "./Tooltip";
 
 export default function Wonder({wonderName, onClickWonder, wonderBackAge}) {
 
@@ -10,9 +11,12 @@ export default function Wonder({wonderName, onClickWonder, wonderBackAge}) {
         2: ageTwoBackSide,
         3: ageThreeBackSide
     }
-    return (<div className="wonder">
+    return (
+    <Tooltip textKey={wonderName}>
+    <div className="wonder">
         <img className="wonder-card" src={wonderImgMap[wonderName]} onClick={onClickWonder}/>
         {wonderBackAge != 0 &&
         <img className="wonder-back" src={cardBackMap[wonderBackAge]}></img>}
-    </div>);
+    </div>
+    </Tooltip>);
 }

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import axios from "axios";
 import { useParams } from "react-router-dom";
 import './Game.css';
@@ -7,16 +7,17 @@ import Collapsible from "./Collapsible";
 import Hand from "./Hand";
 import PlayerMoves from "./PlayerMoves";
 import GameBoard from "./GameBoard";
+import { SettingsContext } from './SettingsContext';
 
 export default function Game() {
-
     const [selectedCardIndex, setSelectedCardIndex] = useState(null);
     const [errorMessage, setErrorMessage] = useState("");
-    const {code} = useParams();
+    const { code } = useParams();
     const [game, setGame] = useState({
         "code": code,
         "step": "SETUP"
-    })
+    });
+    const { autoOpenPlayerHand } = useContext(SettingsContext);
 
     useEffect(() => {
       axios.get(`/api/${code}`).then((response) => {
@@ -102,7 +103,7 @@ export default function Game() {
               handleConstructWonder={handleConstructWonder} 
               handleDestroyCard={handleDestroyCard} 
             />
-            <Collapsible label="Player 1 Hand" defaultOpen={game.currentPlayerNumber===1 || game.step === "DESTROY_BROWN" || game.step === "DESTROY_GREY" || game.step === "WONDER_SELECTION"}>
+            <Collapsible label="Player 1 Hand" defaultOpen={!autoOpenPlayerHand || game.currentPlayerNumber===1 || game.step === "DESTROY_BROWN" || game.step === "DESTROY_GREY" || game.step === "WONDER_SELECTION"}>
               <Hand 
                 sortedHand={game.player1?.sortedHand} 
                 money={game.player1?.money} 
@@ -112,7 +113,7 @@ export default function Game() {
                 destroyCard={(game.step === "DESTROY_GREY" || game.step === "DESTROY_BROWN") && game.currentPlayerNumber===2? handleDestroyCard : null} 
               />
             </Collapsible>
-            <Collapsible label="Player 2 Hand" defaultOpen={game.currentPlayerNumber===2 || game.step === "DESTROY_BROWN" || game.step === "DESTROY_GREY" || game.step === "WONDER_SELECTION"}>
+            <Collapsible label="Player 2 Hand" defaultOpen={!autoOpenPlayerHand || game.currentPlayerNumber===2 || game.step === "DESTROY_BROWN" || game.step === "DESTROY_GREY" || game.step === "WONDER_SELECTION"}>
               <Hand 
                 sortedHand={game.player2?.sortedHand} 
                 money={game.player2?.money} 

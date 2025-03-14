@@ -56,26 +56,27 @@
   position: absolute;
   top: 20px;
   cursor: pointer;
+  width: 65px;
 }
 
 .progress0 {
-  left: 165px;
+  left: 155px;
 }
 
 .progress1 {
-  left: 225px;
+  left: 215px;
 }
 
 .progress2 {
-  left: 285px;
+  left: 275px;
 }
 
 .progress3 {
-  left: 347px;
+  left: 340px;
 }
 
 .progress4 {
-  left: 405px;
+  left: 395px;
 }
 
 .military-9, .military-8, .military-7, .military-6,
@@ -314,4 +315,19 @@
   font-size: 15px;
   font-weight: bold;
   text-align: center;
+}
+
+.help-text {
+  width: 300px;
+  height: fit-content;
+  background-color: white;
+  border: 1px solid black;
+  text-align: center;border-radius: 10px;
+  display: blockflex;
+  margin: 20px;
+}
+
+.token {
+  width: 70px;
+  height: auto;
 }

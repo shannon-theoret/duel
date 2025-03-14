@@ -2,6 +2,7 @@ import Card from './Card';
 import Tokens from './Tokens';
 import Wonder from './Wonder';
 import Coin from './Coin';
+import Tooltip from './Tooltip';
 
 export default function Hand({money, wonders, tokens, sortedHand, onClickWonder, destroyCard}) {
   return (

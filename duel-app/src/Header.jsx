@@ -1,10 +1,13 @@
-import { useState } from 'react';
+import { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { SettingsContext } from './SettingsContext';
+import Slider from './Slider';
 
 export default function Header() {
     const [inputtedGameCode, setInputtedGameCode] = useState('');
     const navigate = useNavigate();
+    const { helpMode, setHelpMode, autoOpenPlayerHand, setAutoOpenPlayerHand } = useContext(SettingsContext);
   
     const newGame = () => {
         axios.post('/api/newGame').then((response) => {
@@ -34,6 +37,9 @@ export default function Header() {
           onChange={(e) => setInputtedGameCode(e.target.value)}
         />
       </nav>
+      <Slider label="Help Mode" isChecked={helpMode} toggleFunction={setHelpMode}></Slider>
+          <Slider label="Auto Open/Close Player Hand" isChecked={autoOpenPlayerHand} toggleFunction={setAutoOpenPlayerHand}></Slider>
+
         </header>
     );
 }

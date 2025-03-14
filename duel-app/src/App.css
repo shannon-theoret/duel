@@ -10,20 +10,22 @@ header {
   background: #007362;
   z-index: 1000;
   padding: 20px;
-  text-align: left;
-  text-indent: 20px;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
 }
 
 .title {
   font-size: 30px;
   color: #e0a038;
   font-family: 'Optimus Princeps', serif;
+  margin-right: auto;
 }
 
 header span {
   color: white;
   font-size: 20px;
-  margin-right: 40px;
+  margin-right: 20px;
 }
 
 header .link {
@@ -31,16 +33,40 @@ header .link {
 }
 
 header input {
-    font-size: 15px;
-    padding: 0.5em;
-    outline: none;
-    border: 2px solid rgb(200, 200, 200);
-    background-color: white;
-    border-radius: 10px;
-    width: 150px;
+  font-size: 15px;
+  padding: 0.5em;
+  outline: none;
+  border: 2px solid rgb(200, 200, 200);
+  background-color: white;
+  border-radius: 10px;
+  width: 150px;
 }
 
 nav {
-  float: right;
-  margin-right: 100px;
+  margin-right: 30px;
+}
+
+slider-container {
+  margin-right: 20px;
+  display: flex;
+  align-items: center;
+}
+
+.tooltip {
+  position: absolute;
+  background-color: white;
+  text-align: center;
+  border-radius: 6px;
+  padding: 5px 0;
+  z-index: 100;
+  top: 100%; /* Adjusted to position below the parent */
+  left: 50%;
+  transform: translateX(-50%);
+  opacity: 0.9;
+  width: auto; /* Adjusted to fit content */
+  max-width: 200px; /* Optional: limit the width */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none; /* Ensure it doesn't interfere with mouse events */
 }

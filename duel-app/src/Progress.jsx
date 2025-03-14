@@ -5,11 +5,12 @@ import broken2left from './img/broken2left.png';
 import broken2right from './img/broken2right.png';
 import broken5left from './img/broken5left.png';
 import broken5right from './img/broken5right.png';
+import Tooltip from './Tooltip.jsx';
 
 export default function Progress({military, tokensAvailable, onTokenClick, chooseScience}) {
 
       const tokenImgs = Array.from(tokensAvailable).map((value, index) => (
-      <img className={`progress${index}`} src={tokenImgMap[value]} onClick={chooseScience ? () => onTokenClick(value) : null}/>
+      <Tooltip keu={value} cName={`progress${index}`} textKey={value}><img src={tokenImgMap[value]} onClick={chooseScience ? () => onTokenClick(value) : null}/></Tooltip>
       ));
 
     return (
