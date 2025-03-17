@@ -1,3 +1,4 @@
+import './Progress.css';
 import progressBar from './img/progressBar.png';
 import militaryToken from './img/militaryToken.png';
 import {tokenImgMap} from './tokenMap.js';

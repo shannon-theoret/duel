@@ -1,0 +1,12 @@
+.instructions-container {
+    padding: 10px;
+}
+
+.instructions-container h5 {
+    color: #333;
+}
+
+.instructions-container p {
+    font-size: 14px;
+    color: #666;
+}

@@ -1,0 +1,43 @@
+header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background: #007362;
+    z-index: 1000;
+    padding: 20px;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+  }
+  
+  .title {
+    font-size: 30px;
+    color: #e0a038;
+    font-family: 'Optimus Princeps', serif;
+    margin-right: auto;
+  }
+  
+  header span {
+    color: white;
+    font-size: 20px;
+    margin-right: 30px;
+  }
+  
+  header .link {
+    cursor: pointer;
+  }
+  
+  header input {
+    font-size: 15px;
+    padding: 0.5em;
+    outline: none;
+    border: 2px solid rgb(200, 200, 200);
+    background-color: white;
+    border-radius: 10px;
+    width: 150px;
+  }
+  
+  nav {
+    margin-right: 30px;
+  }

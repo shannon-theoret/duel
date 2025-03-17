@@ -1,3 +1,4 @@
+import './Coin.css';
 import coin from './img/coin.png';
 
 export default function Coin({money}) {

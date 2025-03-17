@@ -1,3 +1,4 @@
+import './DiscardPile.css';
 import Card from "./Card"
 
 export default function DiscardPile({cards, constructFromDiscard}) {

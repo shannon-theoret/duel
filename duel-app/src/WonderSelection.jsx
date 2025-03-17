@@ -1,3 +1,4 @@
+import './WonderSelection.css';
 import Wonder from "./Wonder";
 
 export default function WonderSelection({wonders, selectWonder}) {

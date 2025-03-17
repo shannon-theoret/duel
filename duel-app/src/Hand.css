@@ -1,0 +1,35 @@
+.player-hand {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    position: relative;
+    margin: 15px;
+  }
+
+  .wonders {
+    display: flex;
+    position: relative;
+    height: 110px;
+  }
+
+  .player-cards {
+    display: flex;
+    position: relative;
+    justify-content: center;
+    width: 640px;
+  }
+ 
+.card-column {
+    display: flex;
+    position: relative;
+    flex-direction: column;
+    width: 120px;
+  }
+  
+  .card-column span {
+    margin-top: -110px;
+  }
+  
+  .card-column span:first-child {
+    margin-top: 0;
+  }

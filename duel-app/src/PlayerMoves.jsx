@@ -1,3 +1,4 @@
+import './PlayerMoves.css';
 import Instructions from "./Instructions";
 import WonderSelection from "./WonderSelection";
 import Button from "./Button";

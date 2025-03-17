@@ -1,3 +1,4 @@
+import './Hand.css';
 import Card from './Card';
 import Tokens from './Tokens';
 import Wonder from './Wonder';

@@ -1,7 +1,9 @@
+import './Instructions.css';
+
 export default function Instructions({step, currentPlayerNumber, cardSelected}) {
 
     return (
-        <div>
+        <div className='instructions-container'>
             {step !== "SETUP" && (
                 <h5>Player {currentPlayerNumber}'s Turn</h5>
             )}

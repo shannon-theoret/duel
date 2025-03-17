@@ -3,6 +3,7 @@
 }
 
 .tooltip {
+  position: absolute;
   background-color: white;
   text-align: center;
   border-radius: 6px;

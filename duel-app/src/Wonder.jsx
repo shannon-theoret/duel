@@ -1,3 +1,4 @@
+import './Wonder.css';
 import { wonderImgMap } from "./wonderMap";
 import ageOneBackSide from './img/ageOneBackSide.jpg';
 import ageTwoBackSide from './img/ageTwoBackSide.jpg';

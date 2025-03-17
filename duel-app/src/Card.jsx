@@ -75,7 +75,7 @@ import moneylendersGuild from './img/g_moneylendersGuild.jpg';
 import scientistsGuild from './img/g_scientistsGuild.jpg';
 import shipownersGuild from './img/g_shipownersGuild.jpg';
 import tacticiansGuild from './img/g_tacticiansGuild.jpg';
-import Tooltip from './Tooltip';
+import './Card.css';
 
 export default function Card({cName, cardName, isActive, cardSetter, index, selected, otherOnClick}) {
     const imgMap = {

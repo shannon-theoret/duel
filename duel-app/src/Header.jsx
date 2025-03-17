@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { SettingsContext } from './SettingsContext';
 import Slider from './Slider';
+import './Header.css';
 
 export default function Header() {
     const [inputtedGameCode, setInputtedGameCode] = useState('');

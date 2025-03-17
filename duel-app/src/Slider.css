@@ -57,3 +57,9 @@
   .slider.round:before {
     border-radius: 50%;
   }
+
+  slider-container {
+    margin-right: 20px;
+    display: flex;
+    align-items: center;
+  }
