@@ -8,6 +8,7 @@ import Hand from "./Hand";
 import PlayerMoves from "./PlayerMoves";
 import GameBoard from "./GameBoard";
 import { SettingsContext } from './SettingsContext';
+import Button from "./Button";
 
 export default function Game() {
     const [selectedCardIndex, setSelectedCardIndex] = useState(null);
@@ -82,6 +83,7 @@ export default function Game() {
 
     return (
       <>
+      <Button text="Test Stuff" onClick={testStuff}></Button>
       {errorMessage && <ErrorBox errorMessage={errorMessage}></ErrorBox>}
         {game.step !== "SETUP" && (
         <div className="game">  

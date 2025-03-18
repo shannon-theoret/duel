@@ -74,4 +74,5 @@ public class ScoreUtilityTest {
                 CardOrValueType.SCIENTIFIC_BUILDING, 4);
         assertEquals(34, ScoreUtility.calculateTotal(scores));
     }
+
 }

@@ -1,6 +1,7 @@
 package com.shannontheoret.duel;
 
 import com.shannontheoret.duel.card.CardName;
+import com.shannontheoret.duel.card.CardOrValueType;
 import com.shannontheoret.duel.dao.GameDao;
 import com.shannontheoret.duel.dao.MilitaryDao;
 import com.shannontheoret.duel.dao.PlayerDao;
@@ -2102,6 +2103,92 @@ public class GameServiceTest {
         verify(gameDao, times(1)).save(game);
         verify(playerDao, times(2)).save(any(Player.class));
         verify(militaryDao, times(1)).save(game.getMilitary());
+    }
+
+    @Test
+    public void discard_gameEnd() throws InvalidMoveException, GameCodeNotFoundException {
+        doNothing().when(gameDao).save(any(Game.class));
+        doNothing().when(playerDao).save(any(Player.class));
+        doNothing().when(militaryDao).save(any(Military.class));
+
+        Game game = gameService.newGame();
+        game.setStep(GameStep.PLAY_CARD);
+        game.setCurrentPlayerNumber(1);
+
+        Player player1 = game.getPlayer1();
+        Player player2 = game.getPlayer2();
+
+        player1.getHand().addAll(Set.of(CardName.ALTER, CardName.TEMPLE, CardName.PANTHEON, CardName.THEATRE,
+                CardName.SENATE, CardName.AQUEDUCT, CardName.BATHS, CardName.COURTHOUSE,
+                CardName.GLASSWORKS, CardName.PRESS, CardName.DRYING_ROOM, CardName.OBSERVATORY,
+                CardName.GLASSBLOWER, CardName.HORSE_BREEDERS, CardName.PARADE_GROUND,
+                CardName.FORUM, CardName.CARAVANSERY, CardName.LIGHTHOUSE, CardName.ARENA,
+                CardName.ACADEMY, CardName.STUDY, CardName.SCRIPTORIUM,
+                CardName.APOTHECARY, CardName.WORKSHOP, CardName.ARCHERY_RANGE,
+                CardName.STABLE, CardName.BARRACKS, CardName.CIRCUS, CardName.UNIVERSITY,
+                CardName.ARSENAL, CardName.WALLS));
+
+        player2.getHand().addAll(Set.of(CardName.GUARD_TOWER, CardName.GARRISON,
+                CardName.LUMBER_YARD, CardName.STONE_PIT, CardName.CLAY_POOL,
+                CardName.STATUE, CardName.GARDENS, CardName.PALACE,
+                CardName.BRICKYARD, CardName.QUARRY,
+                CardName.POSTRUM, CardName.SAWMILL, CardName.SHELF_QUARRY,
+                CardName.ARMORY, CardName.CHAMBER_OF_COMMERCE,
+                CardName.LABORATORY, CardName.LIBRARY, CardName.SCHOOL,
+                CardName.PORT, CardName.PRETORIUM, CardName.TOWNHALL, CardName.FORTIFICATIONS,
+                CardName.BUILDERS_GUILD, CardName.MAGISTRATES_GUILD, CardName.SIEGE_WORKSHOP,
+                CardName.MERCHANTS_GUILD, CardName.MONEYLENDERS_GUILD));
+
+        player1.getTokens().addAll(Set.of(ProgressToken.ARCHITECTURE, ProgressToken.ECONOMY));
+
+        player1.setWonders(Map.of(Wonder.THE_COLOSSUS, 1,
+                Wonder.THE_APPIAN_WAY, 0,
+                Wonder.THE_HANGING_GARDENS, 3,
+                Wonder.THE_GREAT_LIGHTHOUSE, 0));
+
+        player2.getTokens().addAll(Set.of(ProgressToken.LAW));
+
+        player2.setWonders(Map.of(Wonder.THE_MAUSOLEUM, 1,
+                Wonder.THE_PYRAMIDS, 0,
+                Wonder.THE_TEMPLE_OF_ARTEMIS, 3,
+                Wonder.THE_STATUE_OF_ZEUS,0));
+
+        player1.setMoney(4); //gets 6 coins for discarding
+        player2.setMoney(13);
+
+        game.getMilitary().setMilitaryPosition(7);
+        game.setAge(3);
+        Map<Integer, CardName> pyramid = new HashMap<>();
+        pyramid.putAll(Map.of(0, CardName.OBELISK));
+        game.setPyramid(pyramid);
+
+        when(gameDao.findByCode("123")).thenReturn(game);
+
+        gameService.discard("123", 0);
+
+        assertEquals(GameStep.GAME_END, game.getStep(), "Game step should be GAME_END.");
+        assertEquals(34 ,game.getPlayer1().getScore().get(CardOrValueType.CIVILIAN_BUILDING), "Player 1 should have 34 points for CIVILIAN_BUILDING.");
+        assertEquals(12, game.getPlayer1().getScore().get(CardOrValueType.SCIENTIFIC_BUILDING), "Player 1 should have 12 points for SCIENTIFIC_BUILDING.");
+        assertEquals(6, game.getPlayer1().getScore().get(CardOrValueType.COMMERCIAL_BUILDING), "Player 1 should have 6 points for COMMERCIAL_BUILDING.");
+        assertEquals(0, game.getPlayer1().getScore().get(CardOrValueType.GUILD), "Player 1 should have 0 points for GUILD.");
+        assertEquals(10, game.getPlayer1().getScore().get(CardOrValueType.MILITARY_BUILDING), "Player 1 should have 10 points for MILITARY_BUILDING.");
+        assertEquals(6, game.getPlayer1().getScore().get(CardOrValueType.WONDER), "Player 1 should have 6 points for WONDER.");
+        assertEquals(3, game.getPlayer1().getScore().get(CardOrValueType.MONEY), "Player 1 should have 1 point for MONEY.");
+        assertEquals(0, game.getPlayer1().getScore().get(CardOrValueType.PROGRESS_TOKEN), "Player 1 should have 0 points for PROGRESS_TOKEN.");
+        assertEquals(28, game.getPlayer2().getScore().get(CardOrValueType.CIVILIAN_BUILDING), "Player 2 should have 28 points for CIVILIAN_BUILDING.");
+        assertEquals(4, game.getPlayer2().getScore().get(CardOrValueType.SCIENTIFIC_BUILDING), "Player 2 should have 4 points for SCIENTIFIC_BUILDING.");
+        assertEquals(9, game.getPlayer2().getScore().get(CardOrValueType.COMMERCIAL_BUILDING), "Player 2 should have 9 points for COMMERCIAL_BUILDING.");
+        assertEquals(20, game.getPlayer2().getScore().get(CardOrValueType.GUILD), "Player 2 should have 20 points for GUILD.");
+        assertEquals(0, game.getPlayer2().getScore().get(CardOrValueType.MILITARY_BUILDING), "Player 2 should have 0 points for MILITARY_BUILDING.");
+        assertEquals(2, game.getPlayer2().getScore().get(CardOrValueType.WONDER), "Player 2 should have 2 points for WONDER.");
+        assertEquals(4, game.getPlayer2().getScore().get(CardOrValueType.MONEY), "Player 2 should have 4 points for MONEY.");
+        assertEquals(0, game.getPlayer2().getScore().get(CardOrValueType.PROGRESS_TOKEN), "Player 2 should have 0 points for PROGRESS_TOKEN.");
+        assertTrue(game.getPlayer1().getWon(), "Player 1 should have won.");
+        assertFalse(game.getPlayer2().getWon(), "Player 2 should not have won.");
+
+        verify(gameDao, times(2)).save(game);
+        verify(playerDao, times(4)).save(any(Player.class));
+        verify(militaryDao, times(2)).save(game.getMilitary());
     }
 
     private void assertNewPlayer(Player player) {

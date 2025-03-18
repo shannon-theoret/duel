@@ -313,8 +313,53 @@ public class GameService {
     //TODO:removeme
     @Transactional
     public Game testStuff(String code) throws  GameCodeNotFoundException, InvalidMoveException {
-        Game game = findByCode(code);
-        calculateScores(game);
+        Game game = newGame();
+        game.setStep(GameStep.PLAY_CARD);
+        game.setCurrentPlayerNumber(1);
+
+        Player player1 = game.getPlayer1();
+        Player player2 = game.getPlayer2();
+
+        player1.getHand().addAll(Set.of(CardName.ALTER, CardName.TEMPLE, CardName.PANTHEON, CardName.THEATRE,
+                CardName.SENATE, CardName.AQUEDUCT, CardName.BATHS, CardName.COURTHOUSE,
+                CardName.GLASSWORKS, CardName.PRESS, CardName.DRYING_ROOM, CardName.OBSERVATORY,
+                CardName.GLASSBLOWER, CardName.HORSE_BREEDERS, CardName.PARADE_GROUND,
+                CardName.FORUM, CardName.CARAVANSERY, CardName.LIGHTHOUSE, CardName.ARENA,
+                CardName.ACADEMY, CardName.STUDY, CardName.SCRIPTORIUM,
+                CardName.APOTHECARY, CardName.WORKSHOP, CardName.ARCHERY_RANGE,
+                CardName.STABLE, CardName.BARRACKS, CardName.CIRCUS, CardName.UNIVERSITY,
+                CardName.ARSENAL, CardName.WALLS));
+
+        player2.getHand().addAll(Set.of(CardName.GUARD_TOWER, CardName.GARRISON,
+                CardName.LUMBER_YARD, CardName.STONE_PIT, CardName.CLAY_POOL,
+                CardName.STATUE, CardName.GARDENS, CardName.PALACE,
+                CardName.BRICKYARD, CardName.QUARRY,
+                CardName.POSTRUM, CardName.SAWMILL, CardName.SHELF_QUARRY,
+                CardName.ARMORY, CardName.CHAMBER_OF_COMMERCE,
+                CardName.LABORATORY, CardName.LIBRARY, CardName.SCHOOL,
+                CardName.PORT, CardName.PRETORIUM, CardName.TOWNHALL, CardName.FORTIFICATIONS,
+                CardName.BUILDERS_GUILD, CardName.MAGISTRATES_GUILD, CardName.SIEGE_WORKSHOP,
+                CardName.MERCHANTS_GUILD, CardName.MONEYLENDERS_GUILD));
+
+        player1.getTokens().addAll(Set.of(ProgressToken.ARCHITECTURE, ProgressToken.ECONOMY));
+
+        player1.setWonders(Map.of(Wonder.THE_COLOSSUS, 1,
+                Wonder.THE_APPIAN_WAY, 0,
+                Wonder.THE_HANGING_GARDENS, 3,
+                Wonder.THE_GREAT_LIGHTHOUSE, 0));
+
+        player2.getTokens().addAll(Set.of(ProgressToken.LAW));
+
+        player2.setWonders(Map.of(Wonder.THE_MAUSOLEUM, 1,
+                Wonder.THE_PYRAMIDS, 0,
+                Wonder.THE_TEMPLE_OF_ARTEMIS, 3,
+                Wonder.THE_STATUE_OF_ZEUS,0));
+
+        game.setAge(3);
+        Map<Integer, CardName> pyramid = new HashMap<>();
+        pyramid.putAll(Map.of(0, CardName.OBELISK));
+        game.setPyramid(pyramid);
+
         return game;
     }
 
