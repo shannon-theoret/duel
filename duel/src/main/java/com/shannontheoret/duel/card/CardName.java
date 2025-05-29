@@ -12,7 +12,7 @@ public enum CardName {
     BATHS(new CivilianBuildingCard(1, new Cost(new ArrayList<>(Arrays.asList(Resource.STONE))), 3)),
     CLAY_PIT(new RawMaterialCard(1, new Cost(1), new ArrayList<>(Arrays.asList(Resource.BRICK)))),
     CLAY_POOL(new RawMaterialCard(1, new Cost(), new ArrayList<>(Arrays.asList(Resource.BRICK)))),
-    CLAY_RESERVE(new CommercialBuildingCard(1, new Cost(), new HashSet<>(Set.of(Resource.BRICK)))),
+    CLAY_RESERVE(new CommercialBuildingCard(1, new Cost(3), new HashSet<>(Set.of(Resource.BRICK)))),
     GARRISON(new MilitaryBuildingCard(1, new Cost(new ArrayList<>(Arrays.asList(Resource.BRICK))), 0,1)),
     GLASSWORKS(new ManufacturedGoodCard(1, new Cost(1), new ArrayList<>(Arrays.asList(Resource.GLASS)))),
     GUARD_TOWER(new MilitaryBuildingCard(1, new Cost(), 0,1)),

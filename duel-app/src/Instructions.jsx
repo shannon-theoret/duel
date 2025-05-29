@@ -4,7 +4,7 @@ export default function Instructions({step, currentPlayerNumber, cardSelected}) 
 
     return (
         <div className='instructions-container'>
-            {step !== "SETUP" && (
+            {step !== "SETUP" && step !== "GAME_END" && (
                 <h5>Player {currentPlayerNumber}'s Turn</h5>
             )}
             {step === "WONDER_SELECTION" && (

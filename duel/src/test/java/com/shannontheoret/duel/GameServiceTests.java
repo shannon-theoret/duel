@@ -24,7 +24,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class GameServiceTest {
+public class GameServiceTests {
 
     @Mock
     GameDao gameDao;
@@ -149,7 +149,7 @@ public class GameServiceTest {
     }
 
     @Test
-    public void selectWonder_wrongStepThrowsInvalidMoveException() throws InvalidMoveException, GameCodeNotFoundException {
+    public void selectWonder_wrongStepThrowsInvalidMoveException() {
         doNothing().when(gameDao).save(any(Game.class));
         doNothing().when(playerDao).save(any(Player.class));
         doNothing().when(militaryDao).save(any(Military.class));
@@ -170,7 +170,7 @@ public class GameServiceTest {
     }
 
     @Test
-    public void selectWonder_unavailableWonderThrowsInvalidMoveException() throws InvalidMoveException, GameCodeNotFoundException {
+    public void selectWonder_unavailableWonderThrowsInvalidMoveException() {
         doNothing().when(gameDao).save(any(Game.class));
         doNothing().when(playerDao).save(any(Player.class));
         doNothing().when(militaryDao).save(any(Military.class));

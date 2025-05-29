@@ -1,0 +1,65 @@
+.score-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+}
+
+.score {
+    width: 370px;
+    border-collapse: collapse;
+    text-align: left;
+    box-shadow: 0 0 20px;
+}
+
+.score thead {
+    background-color: white;
+}
+
+.score th,
+.score td {
+    padding: 8px 12px;
+    border: 1px solid rgb(226, 224, 224);
+}
+
+.score tr.civilianScore {
+    background-color: #90c0cf;
+}
+
+.score tr.scienceScore {
+    background-color: #9cb9aa;
+}
+
+.score tr.commercialScore {
+    background-color: #f1ecc7;
+}
+
+.score tr.guildScore {
+    background-color: #9299ae
+}
+
+.score tr.wonderScore {
+    background-color: #acb8c2;
+}
+
+.score tr.progressScore {
+    background-color:  #9cb9aa;
+}
+
+.score tr.moneyScore {
+    background-color:  #f1ecc7;
+}
+
+.score tr.militaryScore {
+    background-color: #b4a09d;
+}
+
+.score tr.totalScore {
+    background-color: white;
+}

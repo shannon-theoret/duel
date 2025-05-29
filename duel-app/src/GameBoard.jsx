@@ -7,7 +7,7 @@ import Tokens from "./Tokens";
 
 export default function GameBoard({ game, setSelectedCardIndex, selectedCardIndex, handleChooseProgressTokenFromDiscard, handleChooseProgressToken, handleConstructFromDiscard }) {
   return (
-    <div className="game-inner1">
+    <>
       {game.step === "CHOOSE_PROGRESS_TOKEN_FROM_DISCARD" &&
         <Tokens tokens={game.tokensFromUnavailable} onClickToken={handleChooseProgressTokenFromDiscard}></Tokens>}
       <Progress chooseScience={game.step === "CHOOSE_PROGRESS_TOKEN"} military={game.military} tokensAvailable={game.tokensAvailable} onTokenClick={handleChooseProgressToken}></Progress>
@@ -15,6 +15,6 @@ export default function GameBoard({ game, setSelectedCardIndex, selectedCardInde
         <DiscardPile cards={game.discardedCards} constructFromDiscard={game.step == "CONSTRUCT_FROM_DISCARD" ? handleConstructFromDiscard : null}></DiscardPile>
       </Collapsible>
       <Board cardSetter={setSelectedCardIndex} age={game.age} cards={game.visiblePyramid} selectedCardIndex={selectedCardIndex}></Board>
-    </div>
+    </>
   );
 }

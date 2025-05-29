@@ -14,5 +14,5 @@ export default function NewGame() {
         });
     }
 
-    return <Button text="New Game" onClick={newGame}></Button>;
+    return <Button className="newGame" text="New Game" onClick={newGame}></Button>;
 }
