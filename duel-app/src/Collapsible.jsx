@@ -24,7 +24,7 @@ export default function Collapsible({ children, label, defaultOpen}) {
     <div className="collapsible-container">
       <div className="collapsible-header" onClick={toggleCollapse}>
         <span>{isOpen ? '▼' : '▶'}</span>
-        <span>{label}</span>
+        <strong>{label}</strong>
       </div>
       <div className={`collapsible-content ${isOpen ? 'open' : ''}`}>
         {children}

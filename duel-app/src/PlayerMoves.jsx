@@ -3,7 +3,7 @@ import Instructions from "./Instructions";
 import WonderSelection from "./WonderSelection";
 import Button from "./Button";
 
-export default function PlayerMoves({ game, selectedCardIndex, handleConstructBuilding, handleDiscard, handleSelectWonder, handleConstructWonder, handleDestroyCard }) {
+export default function PlayerMoves({ game, selectedCardIndex, handleConstructBuilding, handleDiscard, handleSelectWonder, handleMakeAiMove }) {
     return (
         <div className="player-moves">
             <Instructions step={game.step} currentPlayerNumber={game.currentPlayerNumber} cardSelected={selectedCardIndex}></Instructions>
@@ -14,6 +14,8 @@ export default function PlayerMoves({ game, selectedCardIndex, handleConstructBu
                     <Button text="Construct the Building" onClick={handleConstructBuilding}></Button>
                     <Button text="Discard the card to obtain coins" onClick={handleDiscard}></Button>
                 </div>) : null}
+            {game.currentPlayerNumber === 2?
+                (<Button text="Have AI Player Make Move" onClick={handleMakeAiMove}></Button>): null}      
         </div>
     );
 }

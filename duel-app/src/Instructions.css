@@ -1,12 +1,16 @@
 .instructions-container {
     padding: 10px;
+    margin-top: 20px;
+    margin-bottom: 10px;
 }
 
-.instructions-container h5 {
-    color: #333;
+.instructions-container strong {
+    padding-right: 10px;
+    color: #007362;
 }
 
-.instructions-container p {
+.instructions-container span {
     font-size: 14px;
     color: #666;
 }
+

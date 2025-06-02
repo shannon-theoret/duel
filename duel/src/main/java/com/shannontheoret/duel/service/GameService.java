@@ -1,9 +1,6 @@
 package com.shannontheoret.duel.service;
 
-import com.shannontheoret.duel.CardDTO;
-import com.shannontheoret.duel.GameStep;
-import com.shannontheoret.duel.ProgressToken;
-import com.shannontheoret.duel.Wonder;
+import com.shannontheoret.duel.*;
 import com.shannontheoret.duel.card.*;
 import com.shannontheoret.duel.dao.GameDao;
 import com.shannontheoret.duel.dao.MilitaryDao;
@@ -27,12 +24,14 @@ public class GameService {
     private GameDao gameDao;
     private PlayerDao playerDao;
     private MilitaryDao militaryDao;
+    private AIPlayerService aiPlayerService;
 
     @Autowired
-    public GameService(GameDao gameDao, PlayerDao playerDao, MilitaryDao militaryDao) {
+    public GameService(GameDao gameDao, PlayerDao playerDao, MilitaryDao militaryDao, AIPlayerService aiPlayerService) {
         this.gameDao = gameDao;
         this.playerDao = playerDao;
         this.militaryDao = militaryDao;
+        this.aiPlayerService = aiPlayerService;
     }
 
     @Transactional
@@ -306,6 +305,43 @@ public class GameService {
         Boolean immediateSecondTurn = game.findActivePlayer().getTokens().contains(ProgressToken.THEOLOGY);
         endTurn(game, immediateSecondTurn);
         save(game);
+        return game;
+    }
+
+    public Game makeAIMove(String code) throws GameCodeNotFoundException, InvalidMoveException {
+        Game game = findByCode(code);
+        if (game.getCurrentPlayerNumber() != 2) {
+            throw new InvalidMoveException("Current player is not an AI player.");
+        }
+        AIMove aiMove = aiPlayerService.makeAIMove(game);
+        switch (aiMove.getMove()) {
+            case SELECT_WONDER:
+                selectWonder(code, aiMove.getMoveData().getWonder());
+                break;
+            case CONSTRUCT_WONDER:
+                constructWonder(code, aiMove.getMoveData().getCardIndex(), aiMove.getMoveData().getWonder());
+                break;
+            case CONSTRUCT_BUILDING:
+                constructBuilding(code, aiMove.getMoveData().getCardIndex());
+                break;
+            case DISCARD:
+                discard(code, aiMove.getMoveData().getCardIndex());
+                break;
+            case CHOOSE_PROGRESS_TOKEN:
+                chooseProgressToken(code, aiMove.getMoveData().getProgressToken());
+                break;
+            case CHOOSE_PROGRESS_TOKEN_FROM_DISCARD:
+                chooseProgressTokenFromDiscard(code, aiMove.getMoveData().getProgressToken());
+                break;
+            case DESTROY_CARD:
+                destroyCard(code, aiMove.getMoveData().getCardName());
+                break;
+            case CONSTRUCT_FROM_DISCARD:
+                constructBuildingFromDiscard(code, aiMove.getMoveData().getCardName());
+                break;
+            default:
+                throw new InvalidMoveException("Not a recognizable player move");
+        }
         return game;
     }
 

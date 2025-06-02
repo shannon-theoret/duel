@@ -99,7 +99,7 @@ public class GameController {
     }
 
     @PostMapping("{gameCode}/destroyCard")
-    public ResponseEntity<Object> destroyCard(@PathVariable("gameCode") String gameCode, @RequestParam CardName cardName) throws GameCodeNotFoundException, InvalidMoveException {
+    public ResponseEntity<Object> destroyCard(@PathVariable("gameCode") String gameCode, @RequestParam CardName cardName) {
         try {
             return ResponseEntity.ok(gameService.destroyCard(gameCode, cardName));
         } catch (GameCodeNotFoundException | InvalidMoveException e) {
@@ -110,6 +110,15 @@ public class GameController {
     @PostMapping("{gameCode}/testStuff")
     public Game testStuff(@PathVariable("gameCode") String gameCode) throws GameCodeNotFoundException, InvalidMoveException {
         return gameService.testStuff(gameCode);
+    }
+
+    @PostMapping("{gameCode}/makeAIMove")
+    public ResponseEntity<Object> makeAIMove(@PathVariable("gameCode") String gameCode) {
+        try {
+            return ResponseEntity.ok(gameService.makeAIMove(gameCode));
+        } catch (GameCodeNotFoundException | InvalidMoveException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
     }
 
 

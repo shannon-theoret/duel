@@ -9,3 +9,11 @@
   flex-direction: column;
   align-items: center;
 }
+
+.ai-spinner {
+  position: absolute;
+  z-index: 8000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

@@ -9,6 +9,8 @@ import PlayerMoves from "./PlayerMoves";
 import GameBoard from "./GameBoard";
 import { SettingsContext } from './SettingsContext';
 import Score from "./Score";
+import Spinner from 'react-bootstrap/Spinner';
+import LoadingOverlay from "./LoadingOverlay";
 
 export default function Game() {
     const [selectedCardIndex, setSelectedCardIndex] = useState(null);
@@ -18,6 +20,7 @@ export default function Game() {
         "code": code,
         "step": "SETUP"
     });
+    const [waitingForAI, setWaitingForAI] = useState(false);
     const { autoOpenPlayerHand } = useContext(SettingsContext);
 
     useEffect(() => {
@@ -29,13 +32,28 @@ export default function Game() {
     }, [code]);
 
     const executePlayerMove = (url, params) => {
-      axios.post(url, null, { params })
-            .then(response => {
-                setGame(response.data);
-                setErrorMessage("");
-            })
-            .catch(error => setErrorMessage(error.response?.data || "An unknown error occurred."));
+        axios.post(url, null, { params })
+        .then(response => {
+            setGame(response.data);
+            setErrorMessage("");
+        })
+        .catch(error => setErrorMessage(error.response?.data || "An unknown error occurred."));
     }
+
+    const handleMakeAiMove = () => {
+      setWaitingForAI(true);
+      axios.post(`api/${code}/makeAIMove`)
+        .then(response => {
+          setGame(response.data);
+          setErrorMessage("");
+          setWaitingForAI(false);
+        })
+        .catch(error => {
+          setErrorMessage(error.response?.data || "An unknown error occurred.");
+          setWaitingForAI(false);
+        });
+    };
+
 
     const handleConstructBuilding = () => {
       executePlayerMove(`/api/${code}/constructBuilding`, { index: selectedCardIndex });
@@ -103,16 +121,18 @@ export default function Game() {
             />
           </div>  
           <div className="game-inner2">
-            <PlayerMoves 
+            {waitingForAI? (<LoadingOverlay />) :
+            (<PlayerMoves 
               game={game} 
-              selectedCardIndex={selectedCardIndex} 
+              selectedCardIndex={selectedCardIndex}
               handleConstructBuilding={handleConstructBuilding} 
               handleDiscard={handleDiscard} 
               handleSelectWonder={handleSelectWonder} 
               handleConstructWonder={handleConstructWonder} 
               handleDestroyCard={handleDestroyCard} 
-            />
-            <Collapsible label="Player 1 City" defaultOpen={!autoOpenPlayerHand || game.currentPlayerNumber===1 || game.step === "DESTROY_BROWN" || game.step === "DESTROY_GREY" || game.step === "WONDER_SELECTION"}>
+              handleMakeAiMove={handleMakeAiMove}
+            />)}
+            <Collapsible label="PLAYER 1 CITY" defaultOpen={!autoOpenPlayerHand || game.currentPlayerNumber===1 || game.step === "DESTROY_BROWN" || game.step === "DESTROY_GREY" || game.step === "WONDER_SELECTION"}>
               <Hand 
                 sortedHand={game.player1?.sortedHand} 
                 money={game.player1?.money} 
@@ -122,7 +142,7 @@ export default function Game() {
                 destroyCard={(game.step === "DESTROY_GREY" || game.step === "DESTROY_BROWN") && game.currentPlayerNumber===2? handleDestroyCard : null} 
               />
             </Collapsible>
-            <Collapsible label="Player 2 City" defaultOpen={!autoOpenPlayerHand || game.currentPlayerNumber===2 || game.step === "DESTROY_BROWN" || game.step === "DESTROY_GREY" || game.step === "WONDER_SELECTION"}>
+            <Collapsible label="PLAYER 2 CITY" defaultOpen={!autoOpenPlayerHand || game.currentPlayerNumber===2 || game.step === "DESTROY_BROWN" || game.step === "DESTROY_GREY" || game.step === "WONDER_SELECTION"}>
               <Hand 
                 sortedHand={game.player2?.sortedHand} 
                 money={game.player2?.money} 

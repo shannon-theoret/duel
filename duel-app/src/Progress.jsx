@@ -11,7 +11,7 @@ import Tooltip from './Tooltip.jsx';
 export default function Progress({military, tokensAvailable, onTokenClick, chooseScience}) {
 
       const tokenImgs = Array.from(tokensAvailable).map((value, index) => (
-      <Tooltip keu={value} cName={`progress${index}`} textKey={value}><img src={tokenImgMap[value]} onClick={chooseScience ? () => onTokenClick(value) : null}/></Tooltip>
+      <Tooltip key={value} cName={`progress${index}`} textKey={value}><img src={tokenImgMap[value]} onClick={chooseScience ? () => onTokenClick(value) : null}/></Tooltip>
       ));
 
     return (
