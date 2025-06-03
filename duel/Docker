@@ -1,0 +1,23 @@
+# Use a slim OpenJDK base image
+FROM openjdk:17-jdk-slim
+
+# Set working directory
+WORKDIR /app
+
+# Copy Maven files first (to leverage Docker cache for deps)
+COPY duel/pom.xml duel/mvnw duel/.mvn /app/
+
+# Download dependencies
+RUN ./mvnw dependency:go-offline
+
+# Copy the rest of the source code
+COPY duel /app
+
+# Package the application
+RUN ./mvnw clean package -DskipTests
+
+# Expose port 8081
+EXPOSE 8081
+
+# Run the application (adjust JAR name as needed)
+CMD ["java", "-jar", "target/duel-0.0.1-SNAPSHOT.jar"]
