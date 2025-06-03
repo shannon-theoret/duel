@@ -15,7 +15,7 @@ export default function PlayerMoves({ game, selectedCardIndex, handleConstructBu
                     <Button text="Discard the card to obtain coins" onClick={handleDiscard}></Button>
                 </div>) : null}
             {game.currentPlayerNumber === 2?
-                (<Button text="Have AI Player Make Move" onClick={handleMakeAiMove}></Button>): null}      
+                (<div><Button text="Have AI Player Make Move" onClick={handleMakeAiMove}></Button></div>): null}      
         </div>
     );
 }

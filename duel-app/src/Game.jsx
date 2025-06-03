@@ -105,10 +105,12 @@ export default function Game() {
         {game.step !== "SETUP" && (
         <div className="game">
           <div className="game-inner1">
-          {game.step === "GAME_END" && (
-              <Score
+          {game.step === "GAME_END" &&
+              (<Score
               player1Score={game.player1.score}
               player2Score={game.player2.score}
+              player1WinStatus={game.player1.winStatus}
+              player2WinStatus={game.player2.winStatus}
               />
             )}
             <GameBoard 

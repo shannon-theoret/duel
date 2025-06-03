@@ -1,11 +1,8 @@
 package com.shannontheoret.duel.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.shannontheoret.duel.CardDTO;
-import com.shannontheoret.duel.ProgressToken;
-import com.shannontheoret.duel.Wonder;
+import com.shannontheoret.duel.*;
 import com.shannontheoret.duel.card.CardName;
-import com.shannontheoret.duel.GameStep;
 import com.shannontheoret.duel.card.CardOrValueType;
 import com.shannontheoret.duel.exceptions.InvalidMoveException;
 import com.shannontheoret.duel.utility.PyramidUtility;
@@ -299,7 +296,8 @@ public class Game {
             player2.decreaseMoneyButNotIntoNegative(5);
         } else if (military.getMilitaryPosition() == -9 || military.getMilitaryPosition() == 9) {
             step = GameStep.GAME_END;
-            findActivePlayer().setWon(true);
+            findActivePlayer().setWinStatus(WinStatus.MILITARY_VICTORY);
+            findNonActivePlayer().setWinStatus(WinStatus.LOST);
         }
     }
 }

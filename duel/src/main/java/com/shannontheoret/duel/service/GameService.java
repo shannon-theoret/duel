@@ -465,7 +465,8 @@ public class GameService {
         player.getTokens().add(progressToken);
         if (player.checkScienceVictory()) {
             game.setStep(GameStep.GAME_END);
-            player.setWon(true);
+            player.setWinStatus(WinStatus.SCIENCE_VICTORY);
+            game.findNonActivePlayer().setWinStatus(WinStatus.LOST);
         }
     }
 
@@ -538,7 +539,8 @@ public class GameService {
         player.getHand().add(cardName);
         if (player.checkScienceVictory()) {
             game.setStep(GameStep.GAME_END);
-            player.setWon(true);
+            player.setWinStatus(WinStatus.SCIENCE_VICTORY);
+            game.findNonActivePlayer().setWinStatus(WinStatus.LOST);
         }
     }
 
@@ -576,16 +578,20 @@ public class GameService {
         Integer player2Total = ScoreUtility.calculateTotal(player2Score);
 
         if(player1Total > player2Total) {
-            game.getPlayer1().setWon(true);
+            game.getPlayer1().setWinStatus(WinStatus.CIVILIAN_VICTORY);
+            game.getPlayer2().setWinStatus(WinStatus.LOST);
         } else if (player2Total > player1Total) {
-            game.getPlayer2().setWon(true);
+            game.getPlayer2().setWinStatus(WinStatus.CIVILIAN_VICTORY);
+            game.getPlayer1().setWinStatus(WinStatus.LOST);
         } else if (player1Score.get(CardOrValueType.CIVILIAN_BUILDING) > player2Score.get(CardOrValueType.CIVILIAN_BUILDING)) {
-            game.getPlayer1().setWon(true);
+            game.getPlayer1().setWinStatus(WinStatus.CIVILIAN_VICTORY);
+            game.getPlayer2().setWinStatus(WinStatus.LOST);
         } else if (player2Score.get(CardOrValueType.CIVILIAN_BUILDING) > player1Score.get(CardOrValueType.CIVILIAN_BUILDING)) {
-            game.getPlayer2().setWon(true);
+            game.getPlayer2().setWinStatus(WinStatus.CIVILIAN_VICTORY);
+            game.getPlayer1().setWinStatus(WinStatus.LOST);
         } else {
-            game.getPlayer1().setWon(true);
-            game.getPlayer2().setWon(true);
+            game.getPlayer1().setWinStatus(WinStatus.CIVILIAN_VICTORY);
+            game.getPlayer2().setWinStatus(WinStatus.CIVILIAN_VICTORY);
         }
     }
 

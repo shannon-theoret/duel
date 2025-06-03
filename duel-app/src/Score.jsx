@@ -1,6 +1,6 @@
 import './Score.css';
 
-export default function Score({player1Score, player2Score}) {
+export default function Score({player1Score, player2Score, player1WinStatus, player2WinStatus}) {
     //TODO: account for scientific victory/military victory
 
         const player1TotalScore = Object.values(player1Score).reduce((sum, value) => sum + value, 0);
@@ -8,6 +8,19 @@ export default function Score({player1Score, player2Score}) {
 
         return (
             <div className='score-overlay'>
+                {player1WinStatus == "CIVILIAN_VICTORY" && 
+                    (<div className='win-summary'>Player 1 has won with {player1TotalScore} points</div>)}
+                {player1WinStatus == "SCIENCE_VICTORY" &&
+                    (<div className='win-summary'>Player 1 has won through Scientific Supremacy</div>)}
+                {player1WinStatus == "MILITARY_VICTORY" &&
+                    (<div className='win-summary'>Player 1 has won through Military Supremacy</div>)}       
+                {player2WinStatus == "CIVILIAN_VICTORY" &&
+                    (<div className='win-summary'>Player 2 has won with {player2TotalScore} points</div>)}
+                {player2WinStatus == "SCIENCE_VICTORY" &&
+                    (<div className='win-summary'>Player 2 has won through Scientific Supremacy</div>)}
+                {player2WinStatus == "MILITARY_VICTORY" &&
+                    (<div className='win-summary'>Player 2 has won through Military Supremacy</div>)}
+                {(player1WinStatus == "CIVILIAN_VICTORY" || player2WinStatus == "CIVILIAN_VICTORY") && (            
                 <table className="score">
                     <thead>
                         <tr>
@@ -64,6 +77,7 @@ export default function Score({player1Score, player2Score}) {
                         </tr>
                     </tbody>
                 </table>
+                )}
             </div>    
         )
     }    

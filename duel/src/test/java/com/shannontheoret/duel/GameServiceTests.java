@@ -772,7 +772,8 @@ public class GameServiceTests {
 
         assertFalse(game.getPyramid().containsKey(3), "Pyramid should not contain index 3.");
         assertEquals(GameStep.GAME_END, game.getStep(), "Game step should be GAME_END.");
-        assertTrue(game.getPlayer2().getWon(), "Player 2 should have won.");
+        assertEquals(game.getPlayer2().getWinStatus(), WinStatus.MILITARY_VICTORY, "Player 2 should have won by military victory.");
+        assertEquals(game.getPlayer1().getWinStatus(), WinStatus.LOST, "Player 1 should have lost.");
         assertEquals(-9, game.getMilitary().getMilitaryPosition(), "Military position should be -9.");
         assertFalse(game.getMilitary().getLoot5Player1Available(), "Loot 5 player 1 should not be available.");
         assertEquals(Set.of(CardName.ARCHERY_RANGE, CardName.SIEGE_WORKSHOP), game.getPlayer2().getHand(), "Hand should have SIEGE_WORKSHOP added to it.");
@@ -1635,8 +1636,8 @@ public class GameServiceTests {
         gameService.chooseProgressToken("123", ProgressToken.LAW);
 
         assertEquals(GameStep.GAME_END, game.getStep(), "LAW token purchase should trigger game end.");
-        assertTrue(game.getPlayer2().getWon(), "Player 2 should have won.");
-        assertFalse(game.getPlayer1().getWon(), "Player 1 should not have won.");
+        assertEquals(game.getPlayer2().getWinStatus(), WinStatus.SCIENCE_VICTORY, "Player 2 should have won by science victory.");
+        assertEquals(game.getPlayer1().getWinStatus(), WinStatus.LOST, "Player 1 should not have lost.");
 
         verify(gameDao, times(2)).save(game);
         verify(playerDao, times(4)).save(any(Player.class));
@@ -2183,8 +2184,8 @@ public class GameServiceTests {
         assertEquals(2, game.getPlayer2().getScore().get(CardOrValueType.WONDER), "Player 2 should have 2 points for WONDER.");
         assertEquals(4, game.getPlayer2().getScore().get(CardOrValueType.MONEY), "Player 2 should have 4 points for MONEY.");
         assertEquals(0, game.getPlayer2().getScore().get(CardOrValueType.PROGRESS_TOKEN), "Player 2 should have 0 points for PROGRESS_TOKEN.");
-        assertTrue(game.getPlayer1().getWon(), "Player 1 should have won.");
-        assertFalse(game.getPlayer2().getWon(), "Player 2 should not have won.");
+        assertEquals(game.getPlayer1().getWinStatus(), WinStatus.CIVILIAN_VICTORY, "Player 1 should have won by civilian victory.");
+        assertEquals(game.getPlayer2().getWinStatus(), WinStatus.CIVILIAN_VICTORY, "Player 2 should not have won.");
 
         verify(gameDao, times(2)).save(game);
         verify(playerDao, times(4)).save(any(Player.class));
@@ -2197,7 +2198,7 @@ public class GameServiceTests {
         assertEquals(7, player.getMoney(), "Player should have 7 coins");
         assertNotNull(player.getTokens(), "Player tokens should not be null");
         assertTrue(player.getTokens().isEmpty(), "Player tokens should be empty");
-        assertFalse(player.getWon(), "Player should not have won");
+        assertEquals(player.getWinStatus(), WinStatus.GAME_IN_PROGRESS, "Player should have a win status of GAME_IN_PROGRESS");
         assertNotNull(player.getSortedHand(), "Player sorted hand should not be null");
         assertTrue(player.getSortedHand().isEmpty(), "Player sorted hand should be empty");
         assertFalse(player.checkScienceVictory());

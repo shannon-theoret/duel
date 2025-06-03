@@ -2,6 +2,7 @@ package com.shannontheoret.duel.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.shannontheoret.duel.ProgressToken;
+import com.shannontheoret.duel.WinStatus;
 import com.shannontheoret.duel.Wonder;
 import com.shannontheoret.duel.card.CardName;
 import com.shannontheoret.duel.card.CardOrValueType;
@@ -63,8 +64,9 @@ public class Player {
     @Enumerated(EnumType.STRING)
     private Set<ProgressToken> tokens = new HashSet<>();
 
-    @Column(name="won", nullable = false)
-    private Boolean won=false;
+    @Column(name="win_status", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private WinStatus winStatus=WinStatus.GAME_IN_PROGRESS;
 
     @ElementCollection
     @CollectionTable(
@@ -133,12 +135,12 @@ public class Player {
         this.wonders = wonders;
     }
 
-    public Boolean getWon() {
-        return won;
+    public WinStatus getWinStatus() {
+        return winStatus;
     }
 
-    public void setWon(Boolean won) {
-        this.won = won;
+    public void setWinStatus(WinStatus winStatus) {
+        this.winStatus = winStatus;
     }
 
     public void decreaseMoneyButNotIntoNegative(Integer money) {
@@ -176,7 +178,7 @@ public class Player {
         if (!hand.equals(player.hand)) return false;
         if (!money.equals(player.money)) return false;
         if (!tokens.equals(player.tokens)) return false;
-        return won.equals(player.won);
+        return winStatus.equals(player.winStatus);
     }
 
     @Override
@@ -185,7 +187,7 @@ public class Player {
         result = 31 * result + hand.hashCode();
         result = 31 * result + money.hashCode();
         result = 31 * result + tokens.hashCode();
-        result = 31 * result + won.hashCode();
+        result = 31 * result + winStatus.hashCode();
         return result;
     }
 
