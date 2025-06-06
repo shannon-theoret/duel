@@ -1,0 +1,10 @@
+options:
+  logging: GCS_ONLY
+
+steps:
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['build', '-t', 'gcr.io/hale-wind-461813-i3/duel', '.']
+    dir: 'duel/duel'
+
+images:
+  - 'gcr.io/$PROJECT_ID/duel'
