@@ -2185,7 +2185,7 @@ public class GameServiceTests {
         assertEquals(4, game.getPlayer2().getScore().get(CardOrValueType.MONEY), "Player 2 should have 4 points for MONEY.");
         assertEquals(0, game.getPlayer2().getScore().get(CardOrValueType.PROGRESS_TOKEN), "Player 2 should have 0 points for PROGRESS_TOKEN.");
         assertEquals(game.getPlayer1().getWinStatus(), WinStatus.CIVILIAN_VICTORY, "Player 1 should have won by civilian victory.");
-        assertEquals(game.getPlayer2().getWinStatus(), WinStatus.CIVILIAN_VICTORY, "Player 2 should not have won.");
+        assertEquals(game.getPlayer2().getWinStatus(), WinStatus.LOST, "Player 2 should have lost.");
 
         verify(gameDao, times(2)).save(game);
         verify(playerDao, times(4)).save(any(Player.class));
