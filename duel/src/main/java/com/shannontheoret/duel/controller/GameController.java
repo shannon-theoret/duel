@@ -106,12 +106,7 @@ public class GameController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
     }
-
-    @PostMapping("{gameCode}/testStuff")
-    public Game testStuff(@PathVariable("gameCode") String gameCode) throws GameCodeNotFoundException, InvalidMoveException {
-        return gameService.testStuff(gameCode);
-    }
-
+    
     @PostMapping("{gameCode}/makeAIMove")
     public ResponseEntity<Object> makeAIMove(@PathVariable("gameCode") String gameCode) {
         try {
