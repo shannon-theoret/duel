@@ -5,5 +5,17 @@ steps:
   - name: 'gcr.io/cloud-builders/docker'
     args: ['build', '-t', 'gcr.io/hale-wind-461813-i3/duel', '-f', 'duel/Dockerfile', 'duel']
 
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: gcloud
+    args:
+      - run
+      - deploy
+      - duel
+      - --image=gcr.io/hale-wind-461813-i3/duel
+      - --region=northamerica-northeast2
+      - --platform=managed
+      - --allow-unauthenticated
+      - --port=8081
+
 images:
   - 'gcr.io/hale-wind-461813-i3/duel'
