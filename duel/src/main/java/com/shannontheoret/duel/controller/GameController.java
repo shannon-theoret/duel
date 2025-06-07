@@ -106,7 +106,7 @@ public class GameController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
     }
-    
+
     @PostMapping("{gameCode}/makeAIMove")
     public ResponseEntity<Object> makeAIMove(@PathVariable("gameCode") String gameCode) {
         try {
