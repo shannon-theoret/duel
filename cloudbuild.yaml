@@ -7,4 +7,4 @@ steps:
     dir: 'duel/duel'
 
 images:
-  - 'gcr.io/$PROJECT_ID/duel'
+  - 'gcr.io/hale-wind-461813-i3/duel'
