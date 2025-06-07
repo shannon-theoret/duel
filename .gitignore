@@ -28,7 +28,6 @@ duel-app/*.pid.lock
 duel-app/.DS_Store
 duel-app/.eslintrc.cjs
 
-duel/.mvn/
 duel/target/
 duel/.idea/
 duel/.vscode/
@@ -36,6 +35,4 @@ duel/.DS_Store
 duel/Thumbs.db
 duel/*.iml
 duel/HELP.md
-duel/mvnw
-duel/mvnw.cmd
 duel/.env
