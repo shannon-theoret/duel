@@ -3,7 +3,7 @@ options:
 
 steps:
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['build', '-t', 'gcr.io/hale-wind-461813-i3/duel', '-f', 'duel/duel/Dockerfile', 'duel/duel']
+    args: ['build', '-t', 'gcr.io/hale-wind-461813-i3/duel', '-f', 'duel/Dockerfile', 'duel']
 
 images:
   - 'gcr.io/hale-wind-461813-i3/duel'
