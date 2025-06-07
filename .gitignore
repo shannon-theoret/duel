@@ -38,5 +38,4 @@ duel/*.iml
 duel/HELP.md
 duel/mvnw
 duel/mvnw.cmd
-duel/src/main/resources/application.properties
 duel/.env
