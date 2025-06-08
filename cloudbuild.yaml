@@ -5,6 +5,10 @@ steps:
   - name: 'gcr.io/cloud-builders/docker'
     args: ['build', '-t', 'gcr.io/hale-wind-461813-i3/duel-api', '-f', 'duel/Dockerfile', 'duel']
 
+
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'gcr.io/hale-wind-461813-i3/duel-api']
+
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
     entrypoint: gcloud
     args:
