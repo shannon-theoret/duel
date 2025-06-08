@@ -15,6 +15,7 @@ steps:
       - --region=northamerica-northeast2
       - --platform=managed
       - --allow-unauthenticated
+      - --set-secrets=SPRING_DATASOURCE_URL=SPRING_DATASOURCE_URL:latest, SPRING_DATASOURCE_USERNAME=SPRING_DATASOURCE_USERNAME:latest, SPRING_DATASOURCE_PASSWORD=SPRING_DATASOURCE_PASSWORD:latest, OPENAI_API_KEY=OPENAI_API_KEY:latest
       - --port=8081
 
 images:
