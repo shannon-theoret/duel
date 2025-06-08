@@ -16,6 +16,10 @@ steps:
       - --platform=managed
       - --allow-unauthenticated
       - --port=8080
+      - --set-secrets=SPRING_DATASOURCE_URL=SPRING_DATASOURCE_URL:latest
+      - --set-secrets=SPRING_DATASOURCE_USERNAME=SPRING_DATASOURCE_USERNAME:latest
+      - --set-secrets=SPRING_DATASOURCE_PASSWORD=SPRING_DATASOURCE_PASSWORD:latest
+      - --set-secrets=OPENAI_API_KEY=OPENAI_API_KEY:latest
 
 images:
   - 'gcr.io/hale-wind-461813-i3/duel-api'
