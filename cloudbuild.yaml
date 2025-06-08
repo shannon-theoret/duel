@@ -3,7 +3,7 @@ options:
 
 steps:
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['build', '-t', 'gcr.io/hale-wind-461813-i3/duel', '-f', 'duel/Dockerfile', 'duel']
+    args: ['build', '-t', 'gcr.io/hale-wind-461813-i3/duel-api', '-f', 'duel/Dockerfile', 'duel']
 
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
     entrypoint: gcloud
@@ -18,4 +18,4 @@ steps:
       - --port=8080
 
 images:
-  - 'gcr.io/hale-wind-461813-i3/duel'
+  - 'gcr.io/hale-wind-461813-i3/duel-api'
