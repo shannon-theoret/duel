@@ -16,7 +16,7 @@ steps:
       - deploy
       - duel-api
       - --image=gcr.io/hale-wind-461813-i3/duel-api
-      - --region=northamerica-northeast2
+      - --region=central1
       - --platform=managed
       - --allow-unauthenticated
       - --port=8080
