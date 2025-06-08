@@ -20,6 +20,7 @@ steps:
       - --platform=managed
       - --allow-unauthenticated
       - --port=8080
+      - --memory=1Gi
       - --set-secrets=SPRING_DATASOURCE_URL=SPRING_DATASOURCE_URL:latest
       - --set-secrets=SPRING_DATASOURCE_USERNAME=SPRING_DATASOURCE_USERNAME:latest
       - --set-secrets=SPRING_DATASOURCE_PASSWORD=SPRING_DATASOURCE_PASSWORD:latest
