@@ -11,7 +11,7 @@ steps:
       - run
       - deploy
       - duel
-      - --image=gcr.io/hale-wind-461813-i3/duel
+      - --image=gcr.io/hale-wind-461813-i3/duel-api
       - --region=northamerica-northeast2
       - --platform=managed
       - --allow-unauthenticated
