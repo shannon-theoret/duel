@@ -10,7 +10,7 @@ public class CardDTO {
         this.cardName = cardName;
         this.isActive = isActive;
     }
-//hi
+
     public CardName getCardName() {
         return cardName;
     }

@@ -13,7 +13,6 @@ function App() {
         <SettingsProvider>
           <Header />
           <Routes>
-            <Route exact path="/" element={<NewGame />} />
             <Route path="/:code" element={<GameWrapper />} />
           </Routes>
         </SettingsProvider>

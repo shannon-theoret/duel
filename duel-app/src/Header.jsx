@@ -4,6 +4,8 @@ import axios from 'axios';
 import { SettingsContext } from './SettingsContext';
 import Slider from './Slider';
 import './Header.css';
+import { API_BASE_URL } from './config';
+
 
 export default function Header() {
     const [inputtedGameCode, setInputtedGameCode] = useState('');
@@ -11,7 +13,7 @@ export default function Header() {
     const { helpMode, setHelpMode, autoOpenPlayerHand, setAutoOpenPlayerHand } = useContext(SettingsContext);
   
     const newGame = () => {
-        axios.post('/api/newGame').then((response) => {
+        axios.post(`${API_BASE_URL}/newGame`).then((response) => {
             navigate(`/${response.data.code}`);
         }).catch((error) => {
           console.error('Error:', error);

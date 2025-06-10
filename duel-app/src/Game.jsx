@@ -9,7 +9,7 @@ import PlayerMoves from "./PlayerMoves";
 import GameBoard from "./GameBoard";
 import { SettingsContext } from './SettingsContext';
 import Score from "./Score";
-import Spinner from 'react-bootstrap/Spinner';
+import { API_BASE_URL } from './config';
 import LoadingOverlay from "./LoadingOverlay";
 
 export default function Game() {
@@ -24,7 +24,7 @@ export default function Game() {
     const { autoOpenPlayerHand } = useContext(SettingsContext);
 
     useEffect(() => {
-      axios.get(`/api/${code}`).then((response) => {
+      axios.get(`${API_BASE_URL}/${code}`).then((response) => {
           setGame(response.data);
       }).catch((error) => {
         setErrorMessage(error.response?.data || "An unknown error occurred.");
@@ -42,7 +42,7 @@ export default function Game() {
 
     const handleMakeAiMove = () => {
       setWaitingForAI(true);
-      axios.post(`api/${code}/makeAIMove`)
+      axios.post(`${API_BASE_URL}/${code}/makeAIMove`)
         .then(response => {
           setGame(response.data);
           setErrorMessage("");
@@ -56,48 +56,38 @@ export default function Game() {
 
 
     const handleConstructBuilding = () => {
-      executePlayerMove(`/api/${code}/constructBuilding`, { index: selectedCardIndex });
+      executePlayerMove(`${API_BASE_URL}/${code}/constructBuilding`, { index: selectedCardIndex });
       setSelectedCardIndex(null);
     }
 
     const handleConstructFromDiscard = (cardName) => {
-      executePlayerMove(`/api/${code}/constructBuildingFromDiscard`, { cardName });
+      executePlayerMove(`${API_BASE_URL}/${code}/constructBuildingFromDiscard`, { cardName });
     }
 
     const handleDiscard = () => {
-      executePlayerMove(`/api/${code}/discard`, { index: selectedCardIndex });
+      executePlayerMove(`${API_BASE_URL}/${code}/discard`, { index: selectedCardIndex });
       setSelectedCardIndex(null);
     }
 
     const handleChooseProgressToken = (token) => {
-      executePlayerMove(`/api/${code}/chooseProgressToken`, { progressToken: token });
+      executePlayerMove(`${API_BASE_URL}/${code}/chooseProgressToken`, { progressToken: token });
     }
 
     const handleChooseProgressTokenFromDiscard = (token) => {
-      executePlayerMove(`/api/${code}/chooseProgressTokenFromDiscard`, { progressToken: token });
+      executePlayerMove(`${API_BASE_URL}/${code}/chooseProgressTokenFromDiscard`, { progressToken: token });
     }
 
     const handleSelectWonder = (wonder) => {
-      executePlayerMove(`/api/${code}/selectWonder`, { wonder });
+      executePlayerMove(`${API_BASE_URL}/${code}/selectWonder`, { wonder });
     }
 
     const handleConstructWonder = (wonder) => {
-      executePlayerMove(`/api/${code}/constructWonder`, { index: selectedCardIndex, wonder });
+      executePlayerMove(`${API_BASE_URL}/${code}/constructWonder`, { index: selectedCardIndex, wonder });
     }
 
     const handleDestroyCard = (cardName) => {
-      executePlayerMove(`/api/${code}/destroyCard`, { cardName });
+      executePlayerMove(`${API_BASE_URL}/${code}/destroyCard`, { cardName });
     }
-
-    //TODO:REMOVEME
-      function testStuff() {
-          axios.post(`/api/${code}/testStuff`).then((response) => {
-            setGame(response.data);
-            setErrorMessage("");
-          }).catch((error) => {
-            setErrorMessage(error.response?.data || "An unknown error occurred.");
-          });
-      }
 
     return (
       <>
