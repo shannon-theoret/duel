@@ -12,6 +12,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+@CrossOrigin(
+        origins = {"https://duel.shannontheoret.com", "http://localhost:5173"},
+        methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE},
+        allowCredentials = "true"
+)
 @RestController
 public class GameController {
 
@@ -114,6 +119,11 @@ public class GameController {
         } catch (GameCodeNotFoundException | InvalidMoveException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
+    }
+
+    @GetMapping("/ping") //avoids cold start latency
+    public ResponseEntity<String> ping() {
+        return ResponseEntity.ok("pong");
     }
 
 
