@@ -34,8 +34,9 @@ public class AIPlayerService {
         this.systemPromptProvider = systemPromptProvider;
         this.objectMapper = objectMapper;
         this.chatOptions = OpenAiChatOptions.builder()
-                .model(OpenAiApi.ChatModel.O4_MINI.getValue())
-                .reasoningEffort("high")
+                //.model(OpenAiApi.ChatModel.O4_MINI.getValue())
+                //.reasoningEffort("high")
+                .model(OpenAiApi.ChatModel.O3.getValue())
                 .temperature(1.0)
                 .build();
     }
