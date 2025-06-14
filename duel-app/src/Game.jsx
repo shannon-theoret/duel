@@ -94,6 +94,7 @@ export default function Game() {
       {errorMessage && <ErrorBox errorMessage={errorMessage}></ErrorBox>}
         {game.step !== "SETUP" && (
         <div className="game">
+          <div className="game-inner-wrapper">
           <div className="game-inner1">
           {game.step === "GAME_END" &&
               (<Score
@@ -144,6 +145,7 @@ export default function Game() {
                 destroyCard={(game.step === "DESTROY_GREY" || game.step === "DESTROY_BROWN") && game.currentPlayerNumber===1? handleDestroyCard : null} 
               />
             </Collapsible>  
+          </div>
           </div>
         </div>)}
         </>);

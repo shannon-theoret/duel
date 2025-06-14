@@ -3,7 +3,7 @@ import Wonder from "./Wonder";
 
 export default function WonderSelection({wonders, selectWonder}) {
     return (
-        <div className="wonders">
+        <div className="selection-wonders">
             {wonders.map(wonder => (
                 <Wonder key={wonder} wonderName={wonder} onClickWonder={() => selectWonder(wonder)}></Wonder>
             ))}

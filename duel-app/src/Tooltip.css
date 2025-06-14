@@ -9,7 +9,7 @@
   border-radius: 6px;
   padding: 5px 10px;
   z-index: 600;
-  transform: translateX(-50%);
+  transform: translateX(-10%);
   opacity: 0.9;
   width: 200px;
   display: flex;

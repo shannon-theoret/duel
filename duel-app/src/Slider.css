@@ -58,8 +58,8 @@
     border-radius: 50%;
   }
 
-  slider-container {
-    margin-right: 20px;
+  .slider-container {
+    margin-right: 40px;
     display: flex;
     align-items: center;
   }

@@ -1,4 +1,3 @@
-import './GameBoard.css';
 import Board from "./Board";
 import Collapsible from "./Collapsible";
 import DiscardPile from "./DiscardPile";
