@@ -63,7 +63,7 @@ public class PyramidUtility {
         ageThree.add(1, new PyramidProperty(true, 3,4));
         ageThree.add(2, new PyramidProperty(false, 5,6));
         ageThree.add(3, new PyramidProperty(false, 6,7));
-        ageThree.add(4, new PyramidProperty(false, 7, 6));
+        ageThree.add(4, new PyramidProperty(false, 7, 8));
         ageThree.add(5, new PyramidProperty(true, -1, 9));
         ageThree.add(6, new PyramidProperty(true, 9, -1));
         ageThree.add(7, new PyramidProperty(true, -1, 10));
