@@ -158,5 +158,5 @@ export default function Card({cName, cardName, isActive, cardSetter, index, sele
         "TACTICIANS_GUILD": <img src={tacticiansGuild} />
     }
 
-    return <span className={cName + (selected ? " sel" : "")} onClick={isActive ? () => cardSetter(index) : otherOnClick ? () => otherOnClick(cardName) : null}>{imgMap[cardName]}</span>;
+    return <span className={cName + (selected ? " sel" : "") + (isActive ? " active-card" : "")} onClick={isActive ? () => cardSetter(index) : otherOnClick ? () => otherOnClick(cardName) : null}>{imgMap[cardName]}</span>;
 }
