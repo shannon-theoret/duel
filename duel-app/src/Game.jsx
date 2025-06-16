@@ -22,6 +22,10 @@ export default function Game() {
     });
     const [waitingForAI, setWaitingForAI] = useState(false);
     const { autoOpenPlayerHand } = useContext(SettingsContext);
+    //TODO: remove me
+    const [aiLevel, setAILevel] = useState(1);
+    const activePlayer = 1;
+    const aiPlayer = 2;
 
     useEffect(() => {
       axios.get(`${API_BASE_URL}/${code}`).then((response) => {
@@ -31,18 +35,34 @@ export default function Game() {
       });
     }, [code]);
 
+    useEffect(() => {
+      if (game.currentPlayerNumber == aiPlayer) {
+        const timeout = setTimeout(() => {
+          handleMakeAiMove();
+        }, 1500);
+        return () => clearTimeout(timeout);
+      }
+    }, [game]);
+
     const executePlayerMove = (url, params) => {
+      if (game.currentPlayerNumber==activePlayer) {
         axios.post(url, null, { params })
         .then(response => {
             setGame(response.data);
             setErrorMessage("");
         })
         .catch(error => setErrorMessage(error.response?.data || "An unknown error occurred."));
+      }
     }
 
     const handleMakeAiMove = () => {
       setWaitingForAI(true);
-      axios.post(`${API_BASE_URL}/${code}/makeAIMove`)
+      console.log(aiLevel);
+      axios.post(`${API_BASE_URL}/${code}/makeAIMove`, null, {
+        params: {
+          level: aiLevel
+        }
+      })
         .then(response => {
           setGame(response.data);
           setErrorMessage("");
@@ -114,8 +134,20 @@ export default function Game() {
             />
           </div>  
           <div className="game-inner2">
-            {waitingForAI? (<LoadingOverlay />) :
-            (<PlayerMoves 
+            {waitingForAI && <LoadingOverlay />}
+            <>
+            <label>
+              AI Level:
+              <select value={aiLevel} onChange={(e) => setAILevel(e.target.value)}>
+                <option value={1}>o4-mini low</option>
+                <option value={2}>o4-mini medium</option>
+                <option value={3}>o4-mini high</option>
+                <option value={4}>o3 low</option>
+                <option value={5}>o3 medium</option>
+                <option value={6}>o3 high</option>
+              </select>
+            </label>
+            <PlayerMoves 
               game={game} 
               selectedCardIndex={selectedCardIndex}
               handleConstructBuilding={handleConstructBuilding} 
@@ -124,7 +156,9 @@ export default function Game() {
               handleConstructWonder={handleConstructWonder} 
               handleDestroyCard={handleDestroyCard} 
               handleMakeAiMove={handleMakeAiMove}
-            />)}
+            />
+            
+            </>
             <Collapsible label="PLAYER 1 CITY" defaultOpen={!autoOpenPlayerHand || game.currentPlayerNumber===1 || game.step === "DESTROY_BROWN" || game.step === "DESTROY_GREY" || game.step === "WONDER_SELECTION"}>
               <Hand 
                 sortedHand={game.player1?.sortedHand} 

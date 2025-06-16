@@ -23,7 +23,7 @@ import java.util.List;
 public class AIPlayerService {
     private final ChatClient chatClient;
     private final SystemPromptProvider systemPromptProvider;
-    private final ChatOptions chatOptions;
+    //private final ChatOptions chatOptions;
     private final ObjectMapper objectMapper;
     private final String initialUserPrompt = "Make the best move given the following current game state. ";
     StructuredOutputConverter<AIMove> converter = new BeanOutputConverter<>(AIMove.class);
@@ -33,15 +33,74 @@ public class AIPlayerService {
         this.chatClient = chatClientBuilder.build();
         this.systemPromptProvider = systemPromptProvider;
         this.objectMapper = objectMapper;
-        this.chatOptions = OpenAiChatOptions.builder()
+        /*this.chatOptions = OpenAiChatOptions.builder()
                 //.model(OpenAiApi.ChatModel.O4_MINI.getValue())
                 //.reasoningEffort("high")
                 .model(OpenAiApi.ChatModel.O3.getValue())
                 .temperature(1.0)
-                .build();
+                .build();*/
     }
 
-    public AIMove makeAIMove(Game game) {
+    public AIMove makeAIMove(Game game, Integer effort) {
+        ChatOptions chatOptions;
+        switch (effort) {
+            case 1: {
+                chatOptions = OpenAiChatOptions.builder()
+                    .model(OpenAiApi.ChatModel.O4_MINI.getValue())
+                    .reasoningEffort("low")
+                    .temperature(1.0)
+                    .build();
+                break;
+            }
+            case 2: {
+                chatOptions = OpenAiChatOptions.builder()
+                        .model(OpenAiApi.ChatModel.O4_MINI.getValue())
+                        .reasoningEffort("medium")
+                        .temperature(1.0)
+                        .build();
+                break;
+            }
+            case 3: {
+                chatOptions = OpenAiChatOptions.builder()
+                        .model(OpenAiApi.ChatModel.O4_MINI.getValue())
+                        .reasoningEffort("high")
+                        .temperature(1.0)
+                        .build();
+                break;
+            }
+            case 4: {
+                chatOptions = OpenAiChatOptions.builder()
+                        .model(OpenAiApi.ChatModel.O3.getValue())
+                        .reasoningEffort("low")
+                        .temperature(1.0)
+                        .build();
+                break;
+            }
+            case 5: {
+                chatOptions = OpenAiChatOptions.builder()
+                        .model(OpenAiApi.ChatModel.O3.getValue())
+                        .reasoningEffort("medium")
+                        .temperature(1.0)
+                        .build();
+                break;
+            }
+            case 6: {
+                chatOptions = OpenAiChatOptions.builder()
+                        .model(OpenAiApi.ChatModel.O3.getValue())
+                        .reasoningEffort("high")
+                        .temperature(1.0)
+                        .build();
+                break;
+            }
+            default: {
+                chatOptions = OpenAiChatOptions.builder()
+                        .model(OpenAiApi.ChatModel.O4_MINI.getValue())
+                        .reasoningEffort("medium")
+                        .temperature(1.0)
+                        .build();
+                break;
+            }
+        }
         Prompt prompt = new Prompt(List.of(systemPromptProvider.getSystemMessage(), createUserMessage(game)), chatOptions);
         String response = chatClient.prompt(prompt).call().content();
         return converter.convert(response);

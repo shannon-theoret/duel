@@ -308,12 +308,12 @@ public class GameService {
         return game;
     }
 
-    public Game makeAIMove(String code) throws GameCodeNotFoundException, InvalidMoveException {
+    public Game makeAIMove(String code, Integer level) throws GameCodeNotFoundException, InvalidMoveException {
         Game game = findByCode(code);
         if (game.getCurrentPlayerNumber() != 2) {
             throw new InvalidMoveException("Current player is not an AI player.");
         }
-        AIMove aiMove = aiPlayerService.makeAIMove(game);
+        AIMove aiMove = aiPlayerService.makeAIMove(game, level);
         switch (aiMove.getMove()) {
             case SELECT_WONDER:
                 selectWonder(code, aiMove.getMoveData().getWonder());

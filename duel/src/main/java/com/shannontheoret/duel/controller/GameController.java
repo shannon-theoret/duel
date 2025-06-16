@@ -113,9 +113,9 @@ public class GameController {
     }
 
     @PostMapping("{gameCode}/makeAIMove")
-    public ResponseEntity<Object> makeAIMove(@PathVariable("gameCode") String gameCode) {
+    public ResponseEntity<Object> makeAIMove(@PathVariable("gameCode") String gameCode, @RequestParam Integer level) {
         try {
-            return ResponseEntity.ok(gameService.makeAIMove(gameCode));
+            return ResponseEntity.ok(gameService.makeAIMove(gameCode, level));
         } catch (GameCodeNotFoundException | InvalidMoveException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
