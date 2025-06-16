@@ -23,7 +23,7 @@ function App() {
         <SettingsProvider>
           <Header />
           <Routes>
-            <Route path="/:code" element={<GameWrapper />} />
+            <Route path="/:code" element={<Game />} />
           </Routes>
         </SettingsProvider>
       </div>
