@@ -8,6 +8,7 @@ export default function PlayerMoves({ game, selectedCardIndex, handleConstructBu
     const opponentsTurn = (game.currentPlayerNumber==2);
     return (
         <div className="player-moves">
+            <p className='previousMove'>{game.previousMove}</p>
             <Instructions step={game.step} currentPlayerNumber={game.currentPlayerNumber} cardSelected={selectedCardIndex} opponentsTurn={opponentsTurn}></Instructions>
             {game.step === "WONDER_SELECTION" ?
                 (<WonderSelection wonders={game.wondersAvailable} selectWonder={handleSelectWonder}></WonderSelection>) : null}

@@ -37,10 +37,7 @@ export default function Game() {
 
     useEffect(() => {
       if (game.currentPlayerNumber == aiPlayer) {
-        const timeout = setTimeout(() => {
-          handleMakeAiMove();
-        }, 1500);
-        return () => clearTimeout(timeout);
+        handleMakeAiMove();
       }
     }, [game]);
 

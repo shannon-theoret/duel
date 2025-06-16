@@ -105,7 +105,7 @@ public class GameServiceTests {
         assertFalse(game.getPlayer1().hasWonder(Wonder.CIRCUS_MAXIMUS), "Player 1 has not purchased CIRCUS_MAXIMUS.");
         assertEquals(Set.of(Wonder.THE_APPIAN_WAY, Wonder.THE_COLOSSUS, Wonder.THE_GREAT_LIBRARY), game.getWondersAvailable(), "Wonders available has removed CIRCUS_MAXIMUS.");
         assertEquals(2, game.getCurrentPlayerNumber(), "Current player number should be 2.");
-
+        assertEquals("", game.getPreviousMove(), "Previous move should be blank.");
         gameService.selectWonder("123", Wonder.THE_APPIAN_WAY);
 
         assertTrue(game.getPlayer2().getWonders().containsKey(Wonder.THE_APPIAN_WAY), "Player 2 should have THE_APPIAN_WAY available for purchase.");
@@ -227,6 +227,7 @@ public class GameServiceTests {
         assertEquals(1, game.getPlayer1().getWonders().get(Wonder.THE_APPIAN_WAY), "Age constructed should be 1.");
         assertEquals(GameStep.PLAY_CARD, game.getStep());
         assertEquals(2, game.getMilitary().getMilitaryPosition());
+        assertEquals("Player 1 constructed The Appian Way wonder.", game.getPreviousMove());
 
         verify(gameDao, times(2)).save(game);
         verify(playerDao, times(4)).save(any(Player.class));
@@ -433,6 +434,7 @@ public class GameServiceTests {
         assertEquals(2, game.getCurrentPlayerNumber(), "Get current player number.");
         assertEquals(0, game.getMilitary().getMilitaryPosition(), "Military position should be 0.");
         assertTrue(game.getPlayer2().hasWonder(Wonder.THE_STATUE_OF_ZEUS), "Player 2 should have THE_STATUE_OF_ZEUS.");
+        assertEquals("Player 2 constructed The Statue of Zeus wonder.", game.getPreviousMove());
 
         verify(gameDao, times(2)).save(game);
         verify(playerDao, times(4)).save(any(Player.class));
@@ -662,6 +664,7 @@ public class GameServiceTests {
         assertEquals(Set.of(CardName.TAVERN), game.getPlayer1().getHand(), "Player hand should have TAVERN.");
         assertEquals(4, game.getPlayer1().getMoney(), "Player money should have increased from 0 to 4.");
         assertEquals(1, game.getAge(),"Age should remain 1.");
+        assertEquals("Player 1 built the building Tavern.", game.getPreviousMove());
 
         verify(gameDao, times(2)).save(game);
         verify(playerDao, times(4)).save(any(Player.class));
@@ -820,6 +823,7 @@ public class GameServiceTests {
         assertFalse(game.getPyramid().containsKey(16));
         assertEquals(4, game.getMilitary().getMilitaryPosition(), "Military position should have increased from 2 to 4.");
         assertFalse(game.getMilitary().getLoot2Player2Available(), "Loot 2 Player 1 should not be available.");
+        assertEquals("Player 1 built the building Archery Range.", game.getPreviousMove());
 
         verify(gameDao, times(2)).save(game);
         verify(playerDao, times(4)).save(any(Player.class));
@@ -1544,6 +1548,7 @@ public class GameServiceTests {
         assertEquals(1, game.getCurrentPlayerNumber(), "Current player number should be 1.");
         assertEquals(Set.of(ProgressToken.ARCHITECTURE), game.getTokensAvailable(), "Tokens available should be ARCHITECTURE.");
         assertEquals(3, game.getPlayer2().getMoney(), "Money should be 3.");
+        assertEquals("Player 2 selected the progress token Masonry.", game.getPreviousMove());
         assertPyramidContainsIndexesUpTo(game.getPyramid(), 19);
         assertAllCardsInAge(game.getPyramid(), 2);
 
@@ -1791,6 +1796,7 @@ public class GameServiceTests {
         assertEquals(GameStep.PLAY_CARD, game.getStep(), "Game step should be PLAY_CARD.");
         assertEquals(1, game.getCurrentPlayerNumber(), "Current player should be 1.");
         assertFalse(game.getPyramid().containsKey(15), "Pyramid should not contain index 15.");
+        assertEquals("Player 2 discarded the card Brickyard.", game.getPreviousMove());
 
         verify(gameDao, times(2)).save(game);
         verify(playerDao, times(4)).save(any(Player.class));
@@ -1934,6 +1940,7 @@ public class GameServiceTests {
         assertEquals(Set.of(CardName.ALTER), game.getPlayer1().getHand(), "Player 1 hand should not change.");
         assertEquals(Set.of(CardName.DISPENSARY), game.getPlayer2().getHand(), "Player 2 should only have DISPENSARY.");
         assertEquals(Set.of(CardName.THEATRE, CardName.QUARRY), game.getDiscardedCards(), "Discard pile should have added QUARRY.");
+        assertEquals("Player 1 destroyed the card Quarry from other player's city.", game.getPreviousMove());
 
         verify(gameDao, times(2)).save(game);
         verify(playerDao, times(4)).save(any(Player.class));
@@ -2030,6 +2037,7 @@ public class GameServiceTests {
         assertEquals(2, game.getCurrentPlayerNumber(), "Current player number should be 2.");
         assertEquals(11, game.getPlayer1().getMoney(), "Player 1 money should be 11.");
         assertTrue(game.getPlayer1().getTokens().contains(ProgressToken.AGRICULTURE), "PLayer 1 should have AGRICULTURE token.");
+        assertEquals("Player 1 selected the progress token Agriculture.", game.getPreviousMove());
 
         verify(gameDao, times(2)).save(game);
         verify(playerDao, times(4)).save(any(Player.class));

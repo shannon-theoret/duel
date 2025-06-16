@@ -177,6 +177,7 @@ public class GameService {
 
         }
         game.getPyramid().remove(cardIndex);
+        game.setPreviousMove("Player " + game.getCurrentPlayerNumber() + " constructed " + wonder.getWonderName() + " wonder.");
         if (game.getStep() == GameStep.PLAY_CARD) {
             Boolean immediatelyPlaySecondTurn = wonder.immediatelyPlaySecondTurn() || player.getTokens().contains(ProgressToken.THEOLOGY);
             endTurn(game, immediatelyPlaySecondTurn);
@@ -208,6 +209,7 @@ public class GameService {
         }
         buildingEffects(game, cardName);
         game.getPyramid().remove(cardIndex);
+        game.setPreviousMove("Player " + game.getCurrentPlayerNumber() + " built the building " + cardName.getCardTitle() + ".");
         if (game.getStep() == GameStep.PLAY_CARD) {
             endTurn(game);
         }
@@ -225,6 +227,7 @@ public class GameService {
         Boolean immediateSecondTurn = game.findActivePlayer().getTokens().contains(ProgressToken.THEOLOGY);
         buildingEffects(game, cardName);
         game.getDiscardedCards().remove(cardName);
+        game.setPreviousMove("Player " + game.getCurrentPlayerNumber() + " built the building " + cardName.getCardTitle() + " from the discard pile.");
         if (game.getStep() == GameStep.CONSTRUCT_FROM_DISCARD) {
             endTurn(game, immediateSecondTurn);
         }
@@ -241,6 +244,7 @@ public class GameService {
         }
         progressEffects(game, progressToken);
         game.getTokensAvailable().remove(progressToken);
+        game.setPreviousMove("Player " + game.getCurrentPlayerNumber() + " selected the progress token " + progressToken.getTokenTitle() + ".");
         if (game.getStep() == GameStep.CHOOSE_PROGRESS_TOKEN) {
             endTurn(game);
         }
@@ -258,6 +262,7 @@ public class GameService {
         Boolean immediateSecondTurn = game.findActivePlayer().getTokens().contains(ProgressToken.THEOLOGY);
         progressEffects(game, progressToken);
         game.getTokensFromUnavailable().clear();
+        game.setPreviousMove("Player " + game.getCurrentPlayerNumber() + " selected the progress token " + progressToken.getTokenTitle() + ".");
         if (game.getStep() == GameStep.CHOOSE_PROGRESS_TOKEN_FROM_DISCARD) {
             endTurn(game, immediateSecondTurn);
         }
@@ -278,6 +283,7 @@ public class GameService {
         CardName discardedCardName = game.getPyramid().get(cardIndex);
         game.getPyramid().remove(cardIndex);
         game.getDiscardedCards().add(discardedCardName);
+        game.setPreviousMove("Player " + game.getCurrentPlayerNumber() + " discarded the card " + discardedCardName.getCardTitle() + ".");
         endTurn(game);
         save(game);
         return game;
@@ -303,6 +309,7 @@ public class GameService {
         opponent.getHand().remove(card);
         game.getDiscardedCards().add(card);
         Boolean immediateSecondTurn = game.findActivePlayer().getTokens().contains(ProgressToken.THEOLOGY);
+        game.setPreviousMove("Player " + game.getCurrentPlayerNumber() + " destroyed the card " + card.getCardTitle() + " from other player's city.");
         endTurn(game, immediateSecondTurn);
         save(game);
         return game;

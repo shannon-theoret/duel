@@ -125,6 +125,9 @@ public class Game {
     @Enumerated(EnumType.STRING)
     private Set<Wonder> wondersUnavailable;
 
+    @Column(name = "previous_move", nullable = false)
+    private String previousMove = "";
+
     public Game() {
     }
 
@@ -241,6 +244,14 @@ public class Game {
 
     public void setWondersUnavailable(Set<Wonder> wondersUnavailable) {
         this.wondersUnavailable = wondersUnavailable;
+    }
+
+    public String getPreviousMove() {
+        return previousMove;
+    }
+
+    public void setPreviousMove(String previousMove) {
+        this.previousMove = previousMove;
     }
 
     public Map<Integer, CardDTO> getVisiblePyramid() {
