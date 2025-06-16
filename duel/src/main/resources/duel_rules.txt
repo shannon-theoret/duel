@@ -1061,4 +1061,4 @@ Your overall output should be in the following structure
 "moveData": {"cardIndex": 10}
 }
 
-Before making a move confirm that the move is valid. The "move" must be valid for the current step. The cardIndex must be in the visiblePyramid AND have isActive be true. If building a card or wonder you must be able to afford the cost.
+Before making a move confirm that the move is valid. The "move" must be valid for the current step. The cardIndex must be in the visiblePyramid AND have isActive be true. If building a card or wonder you must be able to afford the cost. You are not able to build a wonder if 7 wonders have already been built.
