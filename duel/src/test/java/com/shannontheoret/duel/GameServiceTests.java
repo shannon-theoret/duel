@@ -149,7 +149,7 @@ public class GameServiceTests {
     }
 
     @Test
-    public void selectWonder_wrongStepThrowsInvalidMoveException() {
+    public void selectWonder_wrongStepThrowsInvalidMoveException() throws InvalidMoveException {
         doNothing().when(gameDao).save(any(Game.class));
         doNothing().when(playerDao).save(any(Player.class));
         doNothing().when(militaryDao).save(any(Military.class));
@@ -170,7 +170,7 @@ public class GameServiceTests {
     }
 
     @Test
-    public void selectWonder_unavailableWonderThrowsInvalidMoveException() {
+    public void selectWonder_unavailableWonderThrowsInvalidMoveException() throws InvalidMoveException {
         doNothing().when(gameDao).save(any(Game.class));
         doNothing().when(playerDao).save(any(Player.class));
         doNothing().when(militaryDao).save(any(Military.class));
@@ -1357,7 +1357,7 @@ public class GameServiceTests {
     }
 
     @Test
-    public void constructBuilding_notEnoughMoney_throwsInvalidMoveException() {
+    public void constructBuilding_notEnoughMoney_throwsInvalidMoveException() throws InvalidMoveException {
         doNothing().when(gameDao).save(any(Game.class));
         doNothing().when(playerDao).save(any(Player.class));
         doNothing().when(militaryDao).save(any(Military.class));
@@ -1897,7 +1897,7 @@ public class GameServiceTests {
     }
 
     @Test
-    public void discard_indexNotActive_throwsInvalidMoveException() {
+    public void discard_indexNotActive_throwsInvalidMoveException() throws InvalidMoveException {
         doNothing().when(gameDao).save(any(Game.class));
         doNothing().when(playerDao).save(any(Player.class));
         doNothing().when(militaryDao).save(any(Military.class));
@@ -2073,7 +2073,7 @@ public class GameServiceTests {
     }
 
     @Test
-    public void chooseDiscardedScience_wrongStep() {
+    public void chooseDiscardedScience_wrongStep() throws InvalidMoveException {
         doNothing().when(gameDao).save(any(Game.class));
         doNothing().when(playerDao).save(any(Player.class));
         doNothing().when(militaryDao).save(any(Military.class));
@@ -2094,7 +2094,7 @@ public class GameServiceTests {
     }
 
     @Test
-    public void chooseDiscardedScience_tokenUnavailable() {
+    public void chooseDiscardedScience_tokenUnavailable() throws InvalidMoveException  {
         doNothing().when(gameDao).save(any(Game.class));
         doNothing().when(playerDao).save(any(Player.class));
         doNothing().when(militaryDao).save(any(Military.class));

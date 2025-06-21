@@ -11,6 +11,7 @@ import { SettingsContext } from './SettingsContext';
 import Score from "./Score";
 import { API_BASE_URL } from './config';
 import LoadingOverlay from "./LoadingOverlay";
+import SelectActivePlayer from "./SelectActivePlayer";
 
 export default function Game() {
     const [selectedCardIndex, setSelectedCardIndex] = useState(null);
@@ -22,21 +23,24 @@ export default function Game() {
     });
     const [waitingForAI, setWaitingForAI] = useState(false);
     const { autoOpenPlayerHand } = useContext(SettingsContext);
-    //TODO: remove me
-    const [aiLevel, setAILevel] = useState(1);
-    const activePlayer = 1;
-    const aiPlayer = 2;
+    const [activePlayer, setActivePLayer] = useState(() => {
+      return localStorage.getItem(`playerId-${code}`) || '';
+    });
+
+    const AI_PLAYER = 2;
 
     useEffect(() => {
       axios.get(`${API_BASE_URL}/${code}`).then((response) => {
           setGame(response.data);
+          const storedPlayerNum = localStorage.getItem(`playerId-${code}`) || '';
+          setActivePLayer(storedPlayerNum);
       }).catch((error) => {
         setErrorMessage(error.response?.data || "An unknown error occurred.");
       });
     }, [code]);
 
     useEffect(() => {
-      if (game.currentPlayerNumber == aiPlayer) {
+      if (game.currentPlayerNumber == AI_PLAYER && game.player2.ai) {
         handleMakeAiMove();
       }
     }, [game]);
@@ -54,12 +58,7 @@ export default function Game() {
 
     const handleMakeAiMove = () => {
       setWaitingForAI(true);
-      console.log(aiLevel);
-      axios.post(`${API_BASE_URL}/${code}/makeAIMove`, null, {
-        params: {
-          level: aiLevel
-        }
-      })
+      axios.post(`${API_BASE_URL}/${code}/makeAIMove`)
         .then(response => {
           setGame(response.data);
           setErrorMessage("");
@@ -106,6 +105,11 @@ export default function Game() {
       executePlayerMove(`${API_BASE_URL}/${code}/destroyCard`, { cardName });
     }
 
+    const handleSetActivePlayer = (num) => {
+      setActivePLayer(num);
+      localStorage.setItem(`playerId-${code}`, num);
+    }
+
     return (
       <>
       {errorMessage && <ErrorBox errorMessage={errorMessage}></ErrorBox>}
@@ -132,18 +136,8 @@ export default function Game() {
           </div>  
           <div className="game-inner2">
             {waitingForAI && <LoadingOverlay />}
+            {(activePlayer == '') && <SelectActivePlayer handleSetActivePlayer={handleSetActivePlayer}></SelectActivePlayer>}
             <>
-            <label>
-              AI Level:
-              <select value={aiLevel} onChange={(e) => setAILevel(e.target.value)}>
-                <option value={1}>o4-mini low</option>
-                <option value={2}>o4-mini medium</option>
-                <option value={3}>o4-mini high</option>
-                <option value={4}>o3 low</option>
-                <option value={5}>o3 medium</option>
-                <option value={6}>o3 high</option>
-              </select>
-            </label>
             <PlayerMoves 
               game={game} 
               selectedCardIndex={selectedCardIndex}

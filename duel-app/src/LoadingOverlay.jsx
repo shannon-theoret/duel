@@ -3,7 +3,7 @@ import './LoadingOverlay.css';
 
 export default function LoadingOverlay() {
     return (
-        <div className="spinner-overlay">
+        <div className="overlay">
             <Spinner animation="border" role="status"></Spinner>
             <p>Waiting for opponent...</p>
         </div>

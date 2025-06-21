@@ -33,12 +33,6 @@ public class AIPlayerService {
         this.chatClient = chatClientBuilder.build();
         this.systemPromptProvider = systemPromptProvider;
         this.objectMapper = objectMapper;
-        /*this.chatOptions = OpenAiChatOptions.builder()
-                //.model(OpenAiApi.ChatModel.O4_MINI.getValue())
-                //.reasoningEffort("high")
-                .model(OpenAiApi.ChatModel.O3.getValue())
-                .temperature(1.0)
-                .build();*/
     }
 
     public AIMove makeAIMove(Game game, Integer effort) {
@@ -54,32 +48,8 @@ public class AIPlayerService {
             }
             case 2: {
                 chatOptions = OpenAiChatOptions.builder()
-                        .model(OpenAiApi.ChatModel.O4_MINI.getValue())
-                        .reasoningEffort("medium")
-                        .temperature(1.0)
-                        .build();
-                break;
-            }
-            case 3: {
-                chatOptions = OpenAiChatOptions.builder()
-                        .model(OpenAiApi.ChatModel.O4_MINI.getValue())
-                        .reasoningEffort("high")
-                        .temperature(1.0)
-                        .build();
-                break;
-            }
-            case 4: {
-                chatOptions = OpenAiChatOptions.builder()
                         .model(OpenAiApi.ChatModel.O3.getValue())
                         .reasoningEffort("low")
-                        .temperature(1.0)
-                        .build();
-                break;
-            }
-            case 5: {
-                chatOptions = OpenAiChatOptions.builder()
-                        .model(OpenAiApi.ChatModel.O3.getValue())
-                        .reasoningEffort("medium")
                         .temperature(1.0)
                         .build();
                 break;
@@ -95,7 +65,7 @@ public class AIPlayerService {
             default: {
                 chatOptions = OpenAiChatOptions.builder()
                         .model(OpenAiApi.ChatModel.O4_MINI.getValue())
-                        .reasoningEffort("medium")
+                        .reasoningEffort("low")
                         .temperature(1.0)
                         .build();
                 break;

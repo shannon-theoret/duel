@@ -3,7 +3,6 @@ import Game from './Game';
 import NewGame from './NewGame';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import Header from './Header';
-import GameWrapper from './GameWrapper';
 import { SettingsProvider } from './SettingsContext';
 import axios from 'axios';
 import { useEffect } from 'react';
@@ -23,6 +22,7 @@ function App() {
         <SettingsProvider>
           <Header />
           <Routes>
+            <Route path="/" element={<NewGame />} />
             <Route path="/:code" element={<Game />} />
           </Routes>
         </SettingsProvider>

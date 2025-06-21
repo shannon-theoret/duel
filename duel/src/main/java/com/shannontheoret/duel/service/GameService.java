@@ -44,7 +44,12 @@ public class GameService {
     }
 
     @Transactional
-    public Game newGame() {
+    public Game newGame() throws InvalidMoveException {
+        return newGame(false, 1);
+    }
+
+    @Transactional
+    public Game newGame(boolean aiOpponent, Integer level) throws InvalidMoveException {
         Game game = new Game();
         game.setCode(generateCode());
         game.setAge(1);
@@ -64,6 +69,13 @@ public class GameService {
         Player player2 = new Player();
         player2.setMoney(7);
         player2.setHand(new HashSet<>());
+        if (aiOpponent) {
+            player2.setAi(true);
+            if (level < 1 || level > 3) {
+                throw new InvalidMoveException("AI Level must be 1, 2 or 3");
+            }
+            player2.setLevel(level);
+        }
         game.setPlayer1(player1);
         game.setPlayer2(player2);
         game.setMilitary(new Military());
@@ -315,12 +327,12 @@ public class GameService {
         return game;
     }
 
-    public Game makeAIMove(String code, Integer level) throws GameCodeNotFoundException, InvalidMoveException {
+    public Game makeAIMove(String code) throws GameCodeNotFoundException, InvalidMoveException {
         Game game = findByCode(code);
-        if (game.getCurrentPlayerNumber() != 2) {
+        if (!game.findActivePlayer().isAi()) {
             throw new InvalidMoveException("Current player is not an AI player.");
         }
-        AIMove aiMove = aiPlayerService.makeAIMove(game, level);
+        AIMove aiMove = aiPlayerService.makeAIMove(game, game.findActivePlayer().getLevel());
         switch (aiMove.getMove()) {
             case SELECT_WONDER:
                 selectWonder(code, aiMove.getMoveData().getWonder());

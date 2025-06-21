@@ -1,0 +1,9 @@
+.set-active {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    background: white;
+    border: solid 2px #007362;
+    border-radius: 25px;
+    padding: 20px;
+}

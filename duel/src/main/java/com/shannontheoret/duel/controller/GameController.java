@@ -37,8 +37,8 @@ public class GameController {
     }
 
     @PostMapping("newGame")
-    public ResponseEntity<Object> newGame() {
-       return ResponseEntity.ok(gameService.newGame());
+    public ResponseEntity<Object> newGame(@RequestParam Boolean aiOpponent, @RequestParam Integer level) throws InvalidMoveException {
+       return ResponseEntity.ok(gameService.newGame(aiOpponent, level));
     }
 
     @PostMapping("{gameCode}/selectWonder")
@@ -113,9 +113,9 @@ public class GameController {
     }
 
     @PostMapping("{gameCode}/makeAIMove")
-    public ResponseEntity<Object> makeAIMove(@PathVariable("gameCode") String gameCode, @RequestParam Integer level) {
+    public ResponseEntity<Object> makeAIMove(@PathVariable("gameCode") String gameCode) {
         try {
-            return ResponseEntity.ok(gameService.makeAIMove(gameCode, level));
+            return ResponseEntity.ok(gameService.makeAIMove(gameCode));
         } catch (GameCodeNotFoundException | InvalidMoveException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }

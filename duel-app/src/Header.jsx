@@ -13,11 +13,7 @@ export default function Header() {
     const { helpMode, setHelpMode, autoOpenPlayerHand, setAutoOpenPlayerHand } = useContext(SettingsContext);
   
     const newGame = () => {
-        axios.post(`${API_BASE_URL}/newGame`).then((response) => {
-            navigate(`/${response.data.code}`);
-        }).catch((error) => {
-          console.error('Error:', error);
-        });
+        navigate(`/`);
     }
 
     const handleOpenGame = () => {

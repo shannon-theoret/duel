@@ -80,6 +80,12 @@ public class Player {
     @Enumerated(EnumType.STRING)
     private Map<CardOrValueType, Integer> score = new HashMap<>();
 
+    @Column(name="ai", nullable = false)
+    private boolean ai = false;
+
+    @Column(name="level", nullable = true)
+    private Integer level;
+
     public Long getId() {
         return id;
     }
@@ -193,6 +199,22 @@ public class Player {
 
     public void selectWonder(Wonder wonder) {
         this.wonders.put(wonder, 0);
+    }
+
+    public boolean isAi() {
+        return ai;
+    }
+
+    public void setAi(boolean ai) {
+        this.ai = ai;
+    }
+
+    public Integer getLevel() {
+        return level;
+    }
+
+    public void setLevel(Integer level) {
+        this.level = level;
     }
 
     public void purchaseWonder(Wonder wonder, Integer age) throws InvalidMoveException {

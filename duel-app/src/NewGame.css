@@ -1,0 +1,12 @@
+.new-game-setup {
+    margin: 90px auto;
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+    justify-content: center;
+    align-items: center;
+}
+
+
+
+
