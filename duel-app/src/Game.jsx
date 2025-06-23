@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext } from "react";
+import { useState, useEffect, useContext, useRef } from "react";
 import axios from "axios";
 import { useParams } from "react-router-dom";
 import './Game.css';
@@ -12,6 +12,8 @@ import Score from "./Score";
 import { API_BASE_URL } from './config';
 import LoadingOverlay from "./LoadingOverlay";
 import SelectActivePlayer from "./SelectActivePlayer";
+import SockJS from 'sockjs-client';
+import { Client } from '@stomp/stompjs';
 
 export default function Game() {
     const [selectedCardIndex, setSelectedCardIndex] = useState(null);
@@ -22,10 +24,12 @@ export default function Game() {
         "step": "SETUP"
     });
     const [waitingForAI, setWaitingForAI] = useState(false);
+    const hasRequestedAIMove = useRef(false);
     const { autoOpenPlayerHand } = useContext(SettingsContext);
     const [activePlayer, setActivePLayer] = useState(() => {
       return localStorage.getItem(`playerId-${code}`) || '';
     });
+    const isActivePlayersTurn = activePlayer == game.currentPlayerNumber;
 
     const AI_PLAYER = 2;
 
@@ -40,13 +44,36 @@ export default function Game() {
     }, [code]);
 
     useEffect(() => {
-      if (game.currentPlayerNumber == AI_PLAYER && game.player2.ai) {
+          const socket = new SockJS(`${API_BASE_URL}/ws`);
+            const stompClient = new Client({
+                webSocketFactory: () => socket,
+                reconnectDelay: 5000,
+                onConnect: () => {
+                    stompClient.subscribe(`/topic/games/${code}`, message => {
+                        const updatedGame = JSON.parse(message.body);
+                        setGame(updatedGame);
+                    });
+                },
+                onStompError: (frame) => {
+                    console.error("STOMP error", frame.headers["message"], frame.body);
+                }
+            });
+        
+            stompClient.activate();
+        
+            return () => {
+                stompClient.deactivate();
+            };
+    }, [code]);
+
+    useEffect(() => {
+      if (game.currentPlayerNumber == AI_PLAYER && game.player2.ai && !waitingForAI && !hasRequestedAIMove.current && game.step !== 'GAME_END') {
         handleMakeAiMove();
       }
     }, [game]);
 
     const executePlayerMove = (url, params) => {
-      if (game.currentPlayerNumber==activePlayer) {
+      if (isActivePlayersTurn) {
         axios.post(url, null, { params })
         .then(response => {
             setGame(response.data);
@@ -58,15 +85,19 @@ export default function Game() {
 
     const handleMakeAiMove = () => {
       setWaitingForAI(true);
+      hasRequestedAIMove.current = true;
       axios.post(`${API_BASE_URL}/${code}/makeAIMove`)
         .then(response => {
           setGame(response.data);
           setErrorMessage("");
           setWaitingForAI(false);
+          hasRequestedAIMove.current = false; 
         })
         .catch(error => {
           setErrorMessage(error.response?.data || "An unknown error occurred.");
           setWaitingForAI(false);
+          setAllowPlayingForOpponent(false);
+          hasRequestedAIMove.current = false; 
         });
     };
 
@@ -126,7 +157,8 @@ export default function Game() {
               />
             )}
             <GameBoard 
-              game={game} 
+              game={game}
+              isActivePlayersTurn={isActivePlayersTurn} 
               setSelectedCardIndex={setSelectedCardIndex} 
               selectedCardIndex={selectedCardIndex} 
               handleChooseProgressTokenFromDiscard={handleChooseProgressTokenFromDiscard} 
@@ -135,7 +167,7 @@ export default function Game() {
             />
           </div>  
           <div className="game-inner2">
-            {waitingForAI && <LoadingOverlay />}
+            {!isActivePlayersTurn && activePlayer && <LoadingOverlay />}
             {(activePlayer == '') && <SelectActivePlayer handleSetActivePlayer={handleSetActivePlayer}></SelectActivePlayer>}
             <>
             <PlayerMoves 
@@ -147,6 +179,7 @@ export default function Game() {
               handleConstructWonder={handleConstructWonder} 
               handleDestroyCard={handleDestroyCard} 
               handleMakeAiMove={handleMakeAiMove}
+              isActivePlayersTurn={isActivePlayersTurn}
             />
             
             </>

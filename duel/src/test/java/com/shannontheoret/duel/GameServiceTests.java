@@ -17,6 +17,9 @@ import static org.junit.jupiter.api.Assertions.*;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.messaging.Message;
+import org.springframework.messaging.MessageChannel;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 
 import java.util.*;
 
@@ -34,6 +37,9 @@ public class GameServiceTests {
 
     @Mock
     MilitaryDao militaryDao;
+
+    @Mock
+    private SimpMessagingTemplate messagingTemplate;
 
     @InjectMocks
     private GameService gameService;
@@ -80,6 +86,7 @@ public class GameServiceTests {
         verify(gameDao, times(1)).save(game);
         verify(playerDao, times(2)).save(any(Player.class));
         verify(militaryDao, times(1)).save(game.getMilitary());
+        verify(messagingTemplate, times(0)).convertAndSend(anyString(), any(Game.class));
     }
 
     @Test
@@ -146,6 +153,7 @@ public class GameServiceTests {
         verify(gameDao, times(7)).save(game);
         verify(playerDao, times(14)).save(any(Player.class));
         verify(militaryDao, times(7)).save(game.getMilitary());
+        verify(messagingTemplate, times(6)).convertAndSend(anyString(), any(Game.class));
     }
 
     @Test
@@ -167,6 +175,7 @@ public class GameServiceTests {
         verify(gameDao, times(1)).save(game);
         verify(playerDao, times(2)).save(any(Player.class));
         verify(militaryDao, times(1)).save(game.getMilitary());
+        verify(messagingTemplate, times(0)).convertAndSend(anyString(), any(Game.class));
     }
 
     @Test
@@ -188,6 +197,8 @@ public class GameServiceTests {
         verify(gameDao, times(1)).save(game);
         verify(playerDao, times(2)).save(any(Player.class));
         verify(militaryDao, times(1)).save(game.getMilitary());
+        verify(messagingTemplate, times(0)).convertAndSend(anyString(), any(Game.class));
+
     }
 
     @Test
@@ -232,6 +243,7 @@ public class GameServiceTests {
         verify(gameDao, times(2)).save(game);
         verify(playerDao, times(4)).save(any(Player.class));
         verify(militaryDao, times(2)).save(game.getMilitary());
+        verify(messagingTemplate, times(1)).convertAndSend(anyString(), any(Game.class));
     }
 
     @Test
@@ -278,6 +290,7 @@ public class GameServiceTests {
         verify(gameDao, times(2)).save(game);
         verify(playerDao, times(4)).save(any(Player.class));
         verify(militaryDao, times(2)).save(game.getMilitary());
+        verify(messagingTemplate, times(1)).convertAndSend(anyString(), any(Game.class));
     }
 
     @Test
@@ -324,6 +337,7 @@ public class GameServiceTests {
         verify(gameDao, times(2)).save(game);
         verify(playerDao, times(4)).save(any(Player.class));
         verify(militaryDao, times(2)).save(game.getMilitary());
+        verify(messagingTemplate, times(1)).convertAndSend(anyString(), any(Game.class));
     }
 
     @Test
@@ -361,6 +375,7 @@ public class GameServiceTests {
         verify(gameDao, times(2)).save(game);
         verify(playerDao, times(4)).save(any(Player.class));
         verify(militaryDao, times(2)).save(game.getMilitary());
+        verify(messagingTemplate, times(1)).convertAndSend(anyString(), any(Game.class));
     }
 
     @Test
@@ -401,6 +416,7 @@ public class GameServiceTests {
         verify(gameDao, times(2)).save(game);
         verify(playerDao, times(4)).save(any(Player.class));
         verify(militaryDao, times(2)).save(game.getMilitary());
+        verify(messagingTemplate, times(1)).convertAndSend(anyString(), any(Game.class));
     }
 
     @Test
@@ -439,6 +455,8 @@ public class GameServiceTests {
         verify(gameDao, times(2)).save(game);
         verify(playerDao, times(4)).save(any(Player.class));
         verify(militaryDao, times(2)).save(game.getMilitary());
+        verify(messagingTemplate, times(1)).convertAndSend(anyString(), any(Game.class));
+
     }
 
     @Test
@@ -474,6 +492,7 @@ public class GameServiceTests {
         verify(gameDao, times(2)).save(game);
         verify(playerDao, times(4)).save(any(Player.class));
         verify(militaryDao, times(2)).save(game.getMilitary());
+        verify(messagingTemplate, times(1)).convertAndSend(anyString(), any(Game.class));
     }
 
     @Test
@@ -500,6 +519,7 @@ public class GameServiceTests {
             verify(gameDao, times(1)).save(game);
             verify(playerDao, times(2)).save(any(Player.class));
             verify(militaryDao, times(1)).save(game.getMilitary());
+            verify(messagingTemplate, times(0)).convertAndSend(anyString(), any(Game.class));
     }
 
     @Test
@@ -526,6 +546,7 @@ public class GameServiceTests {
             verify(gameDao, times(1)).save(game);
             verify(playerDao, times(2)).save(any(Player.class));
             verify(militaryDao, times(1)).save(game.getMilitary());
+            verify(messagingTemplate, times(0)).convertAndSend(anyString(), any(Game.class));
     }
 
     @Test
@@ -554,6 +575,7 @@ public class GameServiceTests {
             verify(gameDao, times(1)).save(game);
             verify(playerDao, times(2)).save(any(Player.class));
             verify(militaryDao, times(1)).save(game.getMilitary());
+            verify(messagingTemplate, times(0)).convertAndSend(anyString(), any(Game.class));
     }
 
     @Test
@@ -580,6 +602,7 @@ public class GameServiceTests {
         verify(gameDao, times(1)).save(game);
         verify(playerDao, times(2)).save(any(Player.class));
         verify(militaryDao, times(1)).save(game.getMilitary());
+        verify(messagingTemplate, times(0)).convertAndSend(anyString(), any(Game.class));
     }
 
     @Test
@@ -606,6 +629,7 @@ public class GameServiceTests {
             verify(gameDao, times(1)).save(game);
             verify(playerDao, times(2)).save(any(Player.class));
             verify(militaryDao, times(1)).save(game.getMilitary());
+            verify(messagingTemplate, times(0)).convertAndSend(anyString(), any(Game.class));
     }
 
     @Test
@@ -640,6 +664,7 @@ public class GameServiceTests {
         verify(gameDao, times(1)).save(game);
         verify(playerDao, times(2)).save(any(Player.class));
         verify(militaryDao, times(1)).save(game.getMilitary());
+        verify(messagingTemplate, times(0)).convertAndSend(anyString(), any(Game.class));
     }
 
     @Test
@@ -664,11 +689,12 @@ public class GameServiceTests {
         assertEquals(Set.of(CardName.TAVERN), game.getPlayer1().getHand(), "Player hand should have TAVERN.");
         assertEquals(4, game.getPlayer1().getMoney(), "Player money should have increased from 0 to 4.");
         assertEquals(1, game.getAge(),"Age should remain 1.");
-        assertEquals("Player 1 built the building Tavern.", game.getPreviousMove());
+        assertEquals("Player 1 built Tavern.", game.getPreviousMove());
 
         verify(gameDao, times(2)).save(game);
         verify(playerDao, times(4)).save(any(Player.class));
         verify(militaryDao, times(2)).save(game.getMilitary());
+        verify(messagingTemplate, times(1)).convertAndSend(anyString(), any(Game.class));
     }
 
     @Test
@@ -705,6 +731,7 @@ public class GameServiceTests {
         verify(gameDao, times(2)).save(game);
         verify(playerDao, times(4)).save(any(Player.class));
         verify(militaryDao, times(2)).save(game.getMilitary());
+        verify(messagingTemplate, times(1)).convertAndSend(anyString(), any(Game.class));
     }
 
     @Test
@@ -740,6 +767,7 @@ public class GameServiceTests {
         verify(gameDao, times(2)).save(game);
         verify(playerDao, times(4)).save(any(Player.class));
         verify(militaryDao, times(2)).save(game.getMilitary());
+        verify(messagingTemplate, times(1)).convertAndSend(anyString(), any(Game.class));
     }
 
     @Test
@@ -784,6 +812,7 @@ public class GameServiceTests {
         verify(gameDao, times(2)).save(game);
         verify(playerDao, times(4)).save(any(Player.class));
         verify(militaryDao, times(2)).save(game.getMilitary());
+        verify(messagingTemplate, times(1)).convertAndSend(anyString(), any(Game.class));
     }
 
 
@@ -823,11 +852,12 @@ public class GameServiceTests {
         assertFalse(game.getPyramid().containsKey(16));
         assertEquals(4, game.getMilitary().getMilitaryPosition(), "Military position should have increased from 2 to 4.");
         assertFalse(game.getMilitary().getLoot2Player2Available(), "Loot 2 Player 1 should not be available.");
-        assertEquals("Player 1 built the building Archery Range.", game.getPreviousMove());
+        assertEquals("Player 1 built Archery Range.", game.getPreviousMove());
 
         verify(gameDao, times(2)).save(game);
         verify(playerDao, times(4)).save(any(Player.class));
         verify(militaryDao, times(2)).save(game.getMilitary());
+        verify(messagingTemplate, times(1)).convertAndSend(anyString(), any(Game.class));
     }
 
     @Test
@@ -868,6 +898,7 @@ public class GameServiceTests {
         verify(gameDao, times(2)).save(game);
         verify(playerDao, times(4)).save(any(Player.class));
         verify(militaryDao, times(2)).save(game.getMilitary());
+        verify(messagingTemplate, times(1)).convertAndSend(anyString(), any(Game.class));
     }
 
     @Test
@@ -902,6 +933,7 @@ public class GameServiceTests {
         verify(gameDao, times(2)).save(game);
         verify(playerDao, times(4)).save(any(Player.class));
         verify(militaryDao, times(2)).save(game.getMilitary());
+        verify(messagingTemplate, times(1)).convertAndSend(anyString(), any(Game.class));
     }
 
     @Test
@@ -939,6 +971,7 @@ public class GameServiceTests {
         verify(gameDao, times(2)).save(game);
         verify(playerDao, times(4)).save(any(Player.class));
         verify(militaryDao, times(2)).save(game.getMilitary());
+        verify(messagingTemplate, times(1)).convertAndSend(anyString(), any(Game.class));
     }
 
     @Test
@@ -975,6 +1008,7 @@ public class GameServiceTests {
         verify(gameDao, times(2)).save(game);
         verify(playerDao, times(4)).save(any(Player.class));
         verify(militaryDao, times(2)).save(game.getMilitary());
+        verify(messagingTemplate, times(1)).convertAndSend(anyString(), any(Game.class));
     }
 
     @Test
@@ -1006,6 +1040,7 @@ public class GameServiceTests {
         verify(gameDao, times(2)).save(game);
         verify(playerDao, times(4)).save(any(Player.class));
         verify(militaryDao, times(2)).save(game.getMilitary());
+        verify(messagingTemplate, times(1)).convertAndSend(anyString(), any(Game.class));
     }
 
     @Test
@@ -1044,6 +1079,7 @@ public class GameServiceTests {
         verify(gameDao, times(2)).save(game);
         verify(playerDao, times(4)).save(any(Player.class));
         verify(militaryDao, times(2)).save(game.getMilitary());
+        verify(messagingTemplate, times(1)).convertAndSend(anyString(), any(Game.class));
     }
 
     @Test
@@ -1079,6 +1115,7 @@ public class GameServiceTests {
         verify(gameDao, times(2)).save(game);
         verify(playerDao, times(4)).save(any(Player.class));
         verify(militaryDao, times(2)).save(game.getMilitary());
+        verify(messagingTemplate, times(1)).convertAndSend(anyString(), any(Game.class));
     }
 
     @Test
@@ -1116,6 +1153,7 @@ public class GameServiceTests {
         verify(gameDao, times(2)).save(game);
         verify(playerDao, times(4)).save(any(Player.class));
         verify(militaryDao, times(2)).save(game.getMilitary());
+        verify(messagingTemplate, times(1)).convertAndSend(anyString(), any(Game.class));
     }
 
     @Test
@@ -1150,6 +1188,7 @@ public class GameServiceTests {
         verify(gameDao, times(2)).save(game);
         verify(playerDao, times(4)).save(any(Player.class));
         verify(militaryDao, times(2)).save(game.getMilitary());
+        verify(messagingTemplate, times(1)).convertAndSend(anyString(), any(Game.class));
     }
 
     @Test
@@ -1183,6 +1222,7 @@ public class GameServiceTests {
         verify(gameDao, times(2)).save(game);
         verify(playerDao, times(4)).save(any(Player.class));
         verify(militaryDao, times(2)).save(game.getMilitary());
+        verify(messagingTemplate, times(1)).convertAndSend(anyString(), any(Game.class));
     }
 
     @Test
@@ -1215,6 +1255,7 @@ public class GameServiceTests {
         verify(gameDao, times(2)).save(game);
         verify(playerDao, times(4)).save(any(Player.class));
         verify(militaryDao, times(2)).save(game.getMilitary());
+        verify(messagingTemplate, times(1)).convertAndSend(anyString(), any(Game.class));
     }
 
     @Test
@@ -1247,6 +1288,7 @@ public class GameServiceTests {
         verify(gameDao, times(2)).save(game);
         verify(playerDao, times(4)).save(any(Player.class));
         verify(militaryDao, times(2)).save(game.getMilitary());
+        verify(messagingTemplate, times(1)).convertAndSend(anyString(), any(Game.class));
     }
 
     @Test
@@ -1279,6 +1321,7 @@ public class GameServiceTests {
         verify(gameDao, times(2)).save(game);
         verify(playerDao, times(4)).save(any(Player.class));
         verify(militaryDao, times(2)).save(game.getMilitary());
+        verify(messagingTemplate, times(1)).convertAndSend(anyString(), any(Game.class));
     }
 
     @Test
@@ -1313,6 +1356,7 @@ public class GameServiceTests {
         verify(gameDao, times(2)).save(game);
         verify(playerDao, times(4)).save(any(Player.class));
         verify(militaryDao, times(2)).save(game.getMilitary());
+        verify(messagingTemplate, times(1)).convertAndSend(anyString(), any(Game.class));
     }
 
     @Test
@@ -1333,6 +1377,7 @@ public class GameServiceTests {
         verify(gameDao, times(1)).save(game);
         verify(playerDao, times(2)).save(any(Player.class));
         verify(militaryDao, times(1)).save(game.getMilitary());
+        verify(messagingTemplate, times(0)).convertAndSend(anyString(), any(Game.class));
     }
 
     @Test
@@ -1354,6 +1399,7 @@ public class GameServiceTests {
         verify(gameDao, times(1)).save(game);
         verify(playerDao, times(2)).save(any(Player.class));
         verify(militaryDao, times(1)).save(game.getMilitary());
+        verify(messagingTemplate, times(0)).convertAndSend(anyString(), any(Game.class));
     }
 
     @Test
@@ -1376,6 +1422,7 @@ public class GameServiceTests {
         verify(gameDao, times(1)).save(game);
         verify(playerDao, times(2)).save(any(Player.class));
         verify(militaryDao, times(1)).save(game.getMilitary());
+        verify(messagingTemplate, times(0)).convertAndSend(anyString(), any(Game.class));
     }
 
     @Test
@@ -1408,6 +1455,7 @@ public class GameServiceTests {
         verify(gameDao, times(2)).save(game);
         verify(playerDao, times(4)).save(any(Player.class));
         verify(militaryDao, times(2)).save(game.getMilitary());
+        verify(messagingTemplate, times(1)).convertAndSend(anyString(), any(Game.class));
     }
 
     @Test
@@ -1436,6 +1484,7 @@ public class GameServiceTests {
         verify(gameDao, times(2)).save(game);
         verify(playerDao, times(4)).save(any(Player.class));
         verify(militaryDao, times(2)).save(game.getMilitary());
+        verify(messagingTemplate, times(1)).convertAndSend(anyString(), any(Game.class));
     }
 
     @Test
@@ -1460,6 +1509,7 @@ public class GameServiceTests {
         verify(gameDao, times(1)).save(game);
         verify(playerDao, times(2)).save(any(Player.class));
         verify(militaryDao, times(1)).save(game.getMilitary());
+        verify(messagingTemplate, times(0)).convertAndSend(anyString(), any(Game.class));
     }
 
     @Test
@@ -1480,6 +1530,7 @@ public class GameServiceTests {
         verify(gameDao, times(1)).save(game);
         verify(playerDao, times(2)).save(any(Player.class));
         verify(militaryDao, times(1)).save(game.getMilitary());
+        verify(messagingTemplate, times(0)).convertAndSend(anyString(), any(Game.class));
     }
 
     @Test
@@ -1519,7 +1570,7 @@ public class GameServiceTests {
         verify(gameDao, times(2)).save(game);
         verify(playerDao, times(4)).save(any(Player.class));
         verify(militaryDao, times(2)).save(game.getMilitary());
-
+        verify(messagingTemplate, times(1)).convertAndSend(anyString(), any(Game.class));
     }
 
     @Test
@@ -1555,6 +1606,7 @@ public class GameServiceTests {
         verify(gameDao, times(2)).save(game);
         verify(playerDao, times(4)).save(any(Player.class));
         verify(militaryDao, times(2)).save(game.getMilitary());
+        verify(messagingTemplate, times(1)).convertAndSend(anyString(), any(Game.class));
     }
 
     @Test
@@ -1583,6 +1635,7 @@ public class GameServiceTests {
         verify(gameDao, times(1)).save(game);
         verify(playerDao, times(2)).save(any(Player.class));
         verify(militaryDao, times(1)).save(game.getMilitary());
+        verify(messagingTemplate, times(0)).convertAndSend(anyString(), any(Game.class));
 
     }
 
@@ -1612,6 +1665,7 @@ public class GameServiceTests {
         verify(gameDao, times(1)).save(game);
         verify(playerDao, times(2)).save(any(Player.class));
         verify(militaryDao, times(1)).save(game.getMilitary());
+        verify(messagingTemplate, times(0)).convertAndSend(anyString(), any(Game.class));
     }
 
     @Test
@@ -1647,6 +1701,7 @@ public class GameServiceTests {
         verify(gameDao, times(2)).save(game);
         verify(playerDao, times(4)).save(any(Player.class));
         verify(militaryDao, times(2)).save(game.getMilitary());
+        verify(messagingTemplate, times(1)).convertAndSend(anyString(), any(Game.class));
     }
 
     @Test
@@ -1685,6 +1740,7 @@ public class GameServiceTests {
         verify(gameDao, times(2)).save(game);
         verify(playerDao, times(4)).save(any(Player.class));
         verify(militaryDao, times(2)).save(game.getMilitary());
+        verify(messagingTemplate, times(1)).convertAndSend(anyString(), any(Game.class));
     }
 
     @Test
@@ -1723,6 +1779,7 @@ public class GameServiceTests {
         verify(gameDao, times(2)).save(game);
         verify(playerDao, times(4)).save(any(Player.class));
         verify(militaryDao, times(2)).save(game.getMilitary());
+        verify(messagingTemplate, times(1)).convertAndSend(anyString(), any(Game.class));
     }
 
     @Test
@@ -1760,6 +1817,7 @@ public class GameServiceTests {
         verify(gameDao, times(2)).save(game);
         verify(playerDao, times(4)).save(any(Player.class));
         verify(militaryDao, times(2)).save(game.getMilitary());
+        verify(messagingTemplate, times(1)).convertAndSend(anyString(), any(Game.class));
     }
 
     @Test
@@ -1801,6 +1859,7 @@ public class GameServiceTests {
         verify(gameDao, times(2)).save(game);
         verify(playerDao, times(4)).save(any(Player.class));
         verify(militaryDao, times(2)).save(game.getMilitary());
+        verify(messagingTemplate, times(1)).convertAndSend(anyString(), any(Game.class));
     }
 
     @Test
@@ -1838,6 +1897,7 @@ public class GameServiceTests {
         verify(gameDao, times(2)).save(game);
         verify(playerDao, times(4)).save(any(Player.class));
         verify(militaryDao, times(2)).save(game.getMilitary());
+        verify(messagingTemplate, times(1)).convertAndSend(anyString(), any(Game.class));
     }
 
     @Test
@@ -1872,6 +1932,7 @@ public class GameServiceTests {
         verify(gameDao, times(2)).save(game);
         verify(playerDao, times(4)).save(any(Player.class));
         verify(militaryDao, times(2)).save(game.getMilitary());
+        verify(messagingTemplate, times(1)).convertAndSend(anyString(), any(Game.class));
     }
 
     @Test
@@ -1894,6 +1955,7 @@ public class GameServiceTests {
         verify(gameDao, times(1)).save(game);
         verify(playerDao, times(2)).save(any(Player.class));
         verify(militaryDao, times(1)).save(game.getMilitary());
+        verify(messagingTemplate, times(0)).convertAndSend(anyString(), any(Game.class));
     }
 
     @Test
@@ -1915,6 +1977,7 @@ public class GameServiceTests {
         verify(gameDao, times(1)).save(game);
         verify(playerDao, times(2)).save(any(Player.class));
         verify(militaryDao, times(1)).save(game.getMilitary());
+        verify(messagingTemplate, times(0)).convertAndSend(anyString(), any(Game.class));
     }
 
     @Test
@@ -1945,6 +2008,7 @@ public class GameServiceTests {
         verify(gameDao, times(2)).save(game);
         verify(playerDao, times(4)).save(any(Player.class));
         verify(militaryDao, times(2)).save(game.getMilitary());
+        verify(messagingTemplate, times(1)).convertAndSend(anyString(), any(Game.class));
     }
 
     @Test
@@ -1968,6 +2032,7 @@ public class GameServiceTests {
         verify(gameDao, times(1)).save(game);
         verify(playerDao, times(2)).save(any(Player.class));
         verify(militaryDao, times(1)).save(game.getMilitary());
+        verify(messagingTemplate, times(0)).convertAndSend(anyString(), any(Game.class));
     }
 
     @Test
@@ -1991,6 +2056,7 @@ public class GameServiceTests {
         verify(gameDao, times(1)).save(game);
         verify(playerDao, times(2)).save(any(Player.class));
         verify(militaryDao, times(1)).save(game.getMilitary());
+        verify(messagingTemplate, times(0)).convertAndSend(anyString(), any(Game.class));
     }
 
     @Test
@@ -2014,6 +2080,7 @@ public class GameServiceTests {
         verify(gameDao, times(1)).save(game);
         verify(playerDao, times(2)).save(any(Player.class));
         verify(militaryDao, times(1)).save(game.getMilitary());
+        verify(messagingTemplate, times(0)).convertAndSend(anyString(), any(Game.class));
     }
 
     @Test
@@ -2042,6 +2109,7 @@ public class GameServiceTests {
         verify(gameDao, times(2)).save(game);
         verify(playerDao, times(4)).save(any(Player.class));
         verify(militaryDao, times(2)).save(game.getMilitary());
+        verify(messagingTemplate, times(1)).convertAndSend(anyString(), any(Game.class));
     }
 
     @Test
@@ -2070,6 +2138,7 @@ public class GameServiceTests {
         verify(gameDao, times(2)).save(game);
         verify(playerDao, times(4)).save(any(Player.class));
         verify(militaryDao, times(2)).save(game.getMilitary());
+        verify(messagingTemplate, times(1)).convertAndSend(anyString(), any(Game.class));
     }
 
     @Test
@@ -2091,6 +2160,7 @@ public class GameServiceTests {
         verify(gameDao, times(1)).save(game);
         verify(playerDao, times(2)).save(any(Player.class));
         verify(militaryDao, times(1)).save(game.getMilitary());
+        verify(messagingTemplate, times(0)).convertAndSend(anyString(), any(Game.class));
     }
 
     @Test
@@ -2112,6 +2182,7 @@ public class GameServiceTests {
         verify(gameDao, times(1)).save(game);
         verify(playerDao, times(2)).save(any(Player.class));
         verify(militaryDao, times(1)).save(game.getMilitary());
+        verify(messagingTemplate, times(0)).convertAndSend(anyString(), any(Game.class));
     }
 
     @Test
@@ -2198,6 +2269,7 @@ public class GameServiceTests {
         verify(gameDao, times(2)).save(game);
         verify(playerDao, times(4)).save(any(Player.class));
         verify(militaryDao, times(2)).save(game.getMilitary());
+        verify(messagingTemplate, times(1)).convertAndSend(anyString(), any(Game.class));
     }
 
     private void assertNewPlayer(Player player) {

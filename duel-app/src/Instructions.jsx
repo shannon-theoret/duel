@@ -1,13 +1,13 @@
 import './Instructions.css';
 
-export default function Instructions({step, currentPlayerNumber, cardSelected, opponentsTurn}) {
+export default function Instructions({step, currentPlayerNumber, cardSelected, isActivePlayersTurn}) {
 
     return (
         <div className='instructions-container'>
             {step !== "SETUP" && step !== "GAME_END" && (
                 <strong>PLAYER {currentPlayerNumber}'S TURN</strong>
             )}
-            {!opponentsTurn && (
+            {isActivePlayersTurn && (
                 <>
                 {step === "WONDER_SELECTION" && (
                     <span>Select one of the wonders below to add to your hand.</span>
@@ -35,6 +35,7 @@ export default function Instructions({step, currentPlayerNumber, cardSelected, o
                 )}
                 </>
             )}
+            {!isActivePlayersTurn && <span>Wait for your opponent to complete their turn.</span>}
             
         </div>
     )

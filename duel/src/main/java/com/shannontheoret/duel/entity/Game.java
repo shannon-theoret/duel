@@ -17,6 +17,11 @@ public class Game {
     @Column(nullable = false, length = 8, updatable = false)
     private String code;
 
+    @Version
+    @Column(name="version")
+    @JsonIgnore
+    private Long version;
+
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private GameStep step;
@@ -137,6 +142,14 @@ public class Game {
 
     public void setCode(String code) {
         this.code = code;
+    }
+
+    public Long getVersion() {
+        return version;
+    }
+
+    public void setVersion(Long version) {
+        this.version = version;
     }
 
     public GameStep getStep() {

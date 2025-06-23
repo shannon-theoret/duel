@@ -118,6 +118,8 @@ public class GameController {
             return ResponseEntity.ok(gameService.makeAIMove(gameCode));
         } catch (GameCodeNotFoundException | InvalidMoveException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An unknown error has occured.");
         }
     }
 

@@ -1,5 +1,6 @@
 package com.shannontheoret.duel.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.shannontheoret.duel.*;
 import com.shannontheoret.duel.card.*;
 import com.shannontheoret.duel.dao.GameDao;
@@ -10,10 +11,15 @@ import com.shannontheoret.duel.entity.Military;
 import com.shannontheoret.duel.entity.Player;
 import com.shannontheoret.duel.exceptions.GameCodeNotFoundException;
 import com.shannontheoret.duel.exceptions.InvalidMoveException;
+import com.shannontheoret.duel.exceptions.StaleAIDecisionException;
 import com.shannontheoret.duel.utility.HandUtility;
 import com.shannontheoret.duel.utility.ScoreUtility;
 import jakarta.transaction.Transactional;
+import org.hibernate.StaleStateException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -25,13 +31,15 @@ public class GameService {
     private PlayerDao playerDao;
     private MilitaryDao militaryDao;
     private AIPlayerService aiPlayerService;
+    private SimpMessagingTemplate messagingTemplate;
 
     @Autowired
-    public GameService(GameDao gameDao, PlayerDao playerDao, MilitaryDao militaryDao, AIPlayerService aiPlayerService) {
+    public GameService(GameDao gameDao, PlayerDao playerDao, MilitaryDao militaryDao, AIPlayerService aiPlayerService, SimpMessagingTemplate messagingTemplate) {
         this.gameDao = gameDao;
         this.playerDao = playerDao;
         this.militaryDao = militaryDao;
         this.aiPlayerService = aiPlayerService;
+        this.messagingTemplate = messagingTemplate;
     }
 
     @Transactional
@@ -122,6 +130,7 @@ public class GameService {
             }
         }
         save(game);
+        messagingTemplate.convertAndSend("/topic/games/" + game.getCode(), game);
         return game;
     }
 
@@ -195,6 +204,7 @@ public class GameService {
             endTurn(game, immediatelyPlaySecondTurn);
         }
         save(game);
+        messagingTemplate.convertAndSend("/topic/games/" + game.getCode(), game);
         return game;
     }
 
@@ -221,11 +231,12 @@ public class GameService {
         }
         buildingEffects(game, cardName);
         game.getPyramid().remove(cardIndex);
-        game.setPreviousMove("Player " + game.getCurrentPlayerNumber() + " built the building " + cardName.getCardTitle() + ".");
+        game.setPreviousMove("Player " + game.getCurrentPlayerNumber() + " built " + cardName.getCardTitle() + ".");
         if (game.getStep() == GameStep.PLAY_CARD) {
             endTurn(game);
         }
         save(game);
+        messagingTemplate.convertAndSend("/topic/games/" + game.getCode(), game);
         return game;
     }
 
@@ -244,6 +255,7 @@ public class GameService {
             endTurn(game, immediateSecondTurn);
         }
         save(game);
+        messagingTemplate.convertAndSend("/topic/games/" + game.getCode(), game);
         return game;
     }
 
@@ -261,6 +273,7 @@ public class GameService {
             endTurn(game);
         }
         save(game);
+        messagingTemplate.convertAndSend("/topic/games/" + game.getCode(), game);
         return game;
     }
 
@@ -279,6 +292,7 @@ public class GameService {
             endTurn(game, immediateSecondTurn);
         }
         save(game);
+        messagingTemplate.convertAndSend("/topic/games/" + game.getCode(), game);
         return game;
     }
 
@@ -298,6 +312,7 @@ public class GameService {
         game.setPreviousMove("Player " + game.getCurrentPlayerNumber() + " discarded the card " + discardedCardName.getCardTitle() + ".");
         endTurn(game);
         save(game);
+        messagingTemplate.convertAndSend("/topic/games/" + game.getCode(), game);
         return game;
     }
 
@@ -324,15 +339,28 @@ public class GameService {
         game.setPreviousMove("Player " + game.getCurrentPlayerNumber() + " destroyed the card " + card.getCardTitle() + " from other player's city.");
         endTurn(game, immediateSecondTurn);
         save(game);
+        messagingTemplate.convertAndSend("/topic/games/" + game.getCode(), game);
         return game;
     }
 
-    public Game makeAIMove(String code) throws GameCodeNotFoundException, InvalidMoveException {
+    @Retryable(
+            value = { JsonProcessingException.class, InvalidMoveException.class, StaleAIDecisionException.class },
+            maxAttempts = 4,
+            backoff = @Backoff(delay = 1000, multiplier = 2)
+    )
+    public Game makeAIMove(String code) throws GameCodeNotFoundException, InvalidMoveException, StaleStateException {
         Game game = findByCode(code);
-        if (!game.findActivePlayer().isAi()) {
-            throw new InvalidMoveException("Current player is not an AI player.");
+        if (!game.findActivePlayer().isAi() || game.getStep() == GameStep.GAME_END) {
+            return game;
         }
         AIMove aiMove = aiPlayerService.makeAIMove(game, game.findActivePlayer().getLevel());
+        Game refreshedGame =  findByCode(code);
+        if (!refreshedGame.findActivePlayer().isAi() || refreshedGame.getStep() == GameStep.GAME_END) {
+            return refreshedGame;
+        }
+        if (refreshedGame.getVersion() != game.getVersion()) {
+            throw new StaleAIDecisionException("AI move based on stale game state.");
+        }
         switch (aiMove.getMove()) {
             case SELECT_WONDER:
                 selectWonder(code, aiMove.getMoveData().getWonder());
@@ -361,15 +389,6 @@ public class GameService {
             default:
                 throw new InvalidMoveException("Not a recognizable player move");
         }
-        return game;
-    }
-
-    //TODO:removeme
-    @Transactional
-    public Game testStuff(String code) throws  GameCodeNotFoundException, InvalidMoveException {
-        Game game = findByCode(code);
-        endTurn(game, true);
-        save(game);
         return game;
     }
 
