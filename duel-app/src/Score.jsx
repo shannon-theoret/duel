@@ -1,8 +1,6 @@
 import './Score.css';
 
 export default function Score({player1Score, player2Score, player1WinStatus, player2WinStatus}) {
-    //TODO: account for scientific victory/military victory
-
         const player1TotalScore = Object.values(player1Score).reduce((sum, value) => sum + value, 0);
         const player2TotalScore = Object.values(player2Score).reduce((sum, value) => sum + value, 0);
 
