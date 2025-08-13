@@ -28,6 +28,7 @@ export default function NewGame() {
 
 
     return (<div className="new-game-setup">
+        <p>Click new game and then share the game code with your opponent, or select AI opponent to play against an NPC.</p>
         <label>
         <input
             type="checkbox"
@@ -36,6 +37,7 @@ export default function NewGame() {
         />
             AI Opponent
         </label>
+        {aiOpponent && <p>Expect the most difficult AI player's moves to take up to two minutes or select Beginner for a faster game play.</p>}
         {aiOpponent && (<AiLevelSelect
             aiLevel={aiLevel}
             setAiLevel={setAiLevel}

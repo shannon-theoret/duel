@@ -52,3 +52,9 @@
 .loading-overlay {
   pointer-events: none;
 }
+
+.share-game-code {
+    padding: 0.75rem 1.25rem;
+    margin-bottom: 1rem;
+    border-radius: 0.375rem;
+}

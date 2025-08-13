@@ -146,6 +146,7 @@ export default function Game() {
     return (
       <>
       {errorMessage && <ErrorBox errorMessage={errorMessage}></ErrorBox>}
+      {!game.player2.ai && <span className="share-game-code">Game code is {code} have your opponent open this game to join.</span>}
         {game.step !== "SETUP" && (
         <div className="game">
           <div className="game-inner-wrapper">
