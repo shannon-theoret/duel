@@ -21,6 +21,7 @@ function App() {
       <div className='App'>
         <SettingsProvider>
           <Header />
+          <div>This game is no longer being hosted. We hoped you enjoyed playing.</div>
           <Routes>
             <Route path="/" element={<NewGame />} />
             <Route path="/:code" element={<Game />} />
